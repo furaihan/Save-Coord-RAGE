@@ -40,7 +40,7 @@ namespace Save_Coord_RAGE
                 if (string.IsNullOrEmpty(filename) || !filename.EndsWith(".txt"))
                 {
                     Game.LogTrivial("File name is empty or invalid, please provide a valid file name");
-                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "RAGESaveCoords", "~r~Failed", "File name is ~r~empty or invalid~w~, please provide a ~g~valid~w~ file name");
+                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "File name is ~r~empty or invalid~w~, please provide a ~g~valid~w~ file name");
                     if (!filename.EndsWith(".txt")) { Game.HideHelp(); Game.DisplayHelp("Filename must have ~b~\".txt\"~w~ extension", 5000); }
                     return;
                 }
@@ -66,7 +66,7 @@ namespace Save_Coord_RAGE
                         tw.WriteLine(text);
                     }
                 }
-                Game.DisplayNotification("DESKTOP_PC", "FOLDER", "RAGESaveCoords", "~g~Success", "Your coordinate has been saved ~g~successfully");
+                Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your coordinate has been saved ~g~successfully");
             });
         }
         internal static class ClientKeyboardInput
@@ -89,6 +89,38 @@ namespace Save_Coord_RAGE
             private static string FormatKeyBinding(Keys modifierKey, Keys key)
                 => modifierKey == Keys.None ? $"~{key.GetInstructionalId()}~" :
                                               $"~{modifierKey.GetInstructionalId()}~ ~+~ ~{key.GetInstructionalId()}~";
+        }
+        internal static void CheckDirectory()
+        {
+            if (!Directory.Exists(@"Plugins/Save Coord"))
+            {
+                Directory.CreateDirectory(@"Plugins/Save Coord");
+                Game.LogTrivial("Creating \"Plugins/Save Coord\" directory");
+            }
+            else if (!Directory.Exists(@"Plugins/Save Coord/XML Export"))
+            {
+                Directory.CreateDirectory(@"Plugins/Save Coord/XML Export");
+                Game.LogTrivial("Creating \"Plugins/Save Coord/XML Export\" directory");
+            }
+            else Game.LogTrivial("Directory check passed");
+            if (!File.Exists(@"Plugins/SaveCoordConfig.ini"))
+            {
+                string[] itu = new string[]
+                {
+                    "[Initialization]",
+                    "OpenMenuKey=Q",
+                    "OpenMenuModifier=LControlKey",
+                    "CheckOtherPluginMenuVisibility=false",
+                    "BoostPerformance=false"
+                };
+                var path = @"Plugins/SaveCoordConfig.ini";
+                var file = File.Create(path);
+                file.Close();
+                TextWriter tw = new StreamWriter(path);
+                foreach (string s in itu) tw.WriteLine(s);
+                tw.Close();
+            }
+            else Game.LogTrivial("INI Check Passed");
         }
     }
 }

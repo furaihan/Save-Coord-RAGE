@@ -20,25 +20,30 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static List<string> locationGroup;
         internal static void CreateCoordsManagerMenu()
         {
-            locationManager = new UIMenu("Coords Manager", "Manage your saved coordinates here");
+            locationManager = new UIMenu("Coords Manager", "Manage your saved coordinates here")
+            {
+                ParentMenu = Menu.mainMenu,
+                WidthOffset = 250,
+                AllowCameraMovement = true,
+                MouseControlsEnabled = false
+            };
             Menu._menuPool.Add(locationManager);
             locationGroup = Alat.GetLocationGroups();
-            locationGroupFile = new UIMenuListScrollerItem<string>("Location Groups", "", locationGroup));
-            locationManager.ParentMenu = Menu.mainMenu;
-            locationManager.WidthOffset = 250;
-            refreshIndex = new UIMenuItem("Refresh", "Refresh current location group, useful if you have new location group but haven't show on list");
+            locationGroupFile = new UIMenuListScrollerItem<string>("Location Groups", "", locationGroup);
+            refreshIndex = new UIMenuItem("Refresh", "Refresh current location group, useful if you have new location group but haven't show on list")
+            {
+                LeftBadge = UIMenuItem.BadgeStyle.Alert,
+                BackColor = Color.LightGray,
+                ForeColor = Color.Black
+            };
             getNearestLocaionDistance = new UIMenuItem("Get Nearest Location", "Get nearest location from selected location group");
-            placeMarker = new UIMenuItem("Place Marker / Checkpoint", "Place a marker or a checkpoint on every location in selected location group");
+            placeMarker = new UIMenuItem("Place Marker / Checkpoint", "Place a marker or a checkpoint on every location in selected location group (Coming Soon)")
+            {
+                Enabled = false
+            };
             setRouteToNearest = new UIMenuItem("Enable Route on Nearest Location", "");
             locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, refreshIndex);
-            refreshIndex.LeftBadge = UIMenuItem.BadgeStyle.Alert;
-            refreshIndex.BackColor = Color.LightGray;
-            refreshIndex.ForeColor = Color.Black;
-
-            locationManager.AllowCameraMovement = true;
-            locationManager.MouseControlsEnabled = false;
             Menu.mainMenu.BindMenuToItem(locationManager, Menu.openLocationManager);
-            locationManager.ParentMenu = Menu.mainMenu;
             locationManager.RefreshIndex();
             locationManager.OnItemSelect += MenuHandler.ItemSelectHandler;
         }

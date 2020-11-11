@@ -59,6 +59,7 @@
     <Compile Include="MenuHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDivision\Coordinate.cs" />
+    <Compile Include="XmlDivision\Serializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

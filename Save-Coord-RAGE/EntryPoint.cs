@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,9 @@ namespace Save_Coord_RAGE
         {
             GameFiber.StartNew(delegate
             {
-                Game.LogTrivial("Save Coords Plugin loaded successfully");
+                Game.LogTrivial("Save Coord Plugin loaded successfully");
                 Game.DisplayNotification("CHAR_SOCIAL_CLUB", "CHAR_SOCIAL_CLUB", "Save Coord", "~g~Success", "Save Coord Plugin loaded ~g~successfully");
+                Alat.CheckDirectory();
                 Menu.CreateMenu();
             });
         }
