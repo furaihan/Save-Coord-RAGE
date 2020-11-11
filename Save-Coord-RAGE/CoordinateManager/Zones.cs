@@ -10,6 +10,8 @@ namespace Save_Coord_RAGE.CoordinateManager
 {
     internal static class Zones
     {
+        /* Thanks to Albo1125 for his open sorce code
+        https://github.com/Albo1125/Albo1125-Common/blob/master/Albo1125.Common/CommonLibrary/Zones.cs */
         internal enum EWorldZone
         {
             NULL,
