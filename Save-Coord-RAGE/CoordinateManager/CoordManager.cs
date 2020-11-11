@@ -126,5 +126,21 @@ namespace Save_Coord_RAGE.CoordinateManager
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while while calculating a distance");
             }
         }
+        internal static List<float> GetHeadingFromFile()
+        {
+            var lines = File.ReadLines(@"C:\Users\gerai\OneDrive\Desktop\SuspiciousVehicle.txt");
+            List<float> headingList = new List<float>();
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("("))
+                {
+                    var result = line.Substring(line.IndexOf("),") + 2);
+                    float resultf;
+                    float.TryParse(result, NumberStyles.Float, CultureInfo.InvariantCulture.NumberFormat, out resultf);
+                    headingList.Add(resultf);
+                }
+            }
+            return headingList;
+        }
     }
 }

@@ -107,7 +107,7 @@ namespace Save_Coord_RAGE
                         if (!UIMenu.IsAnyMenuVisible) Menu.mainMenu.Visible = true;
                         else if (UIMenu.IsAnyMenuVisible) Menu.mainMenu.Visible = false; Game.LogTrivial("Other plugin menu is already opened");
                     }
-                    else if (!Initialize.checkVisibility) Menu.mainMenu.Visible = false;
+                    else if (!Initialize.checkVisibility) Menu.mainMenu.Visible = true;
                 }
             }
         }

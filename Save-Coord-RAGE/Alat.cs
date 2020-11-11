@@ -97,12 +97,12 @@ namespace Save_Coord_RAGE
                 Directory.CreateDirectory(@"Plugins/Save Coord");
                 Game.LogTrivial("Creating \"Plugins/Save Coord\" directory");
             }
-            else if (!Directory.Exists(@"Plugins/Save Coord/XML Export"))
+            if (!Directory.Exists(@"Plugins/Save Coord/XML Export"))
             {
                 Directory.CreateDirectory(@"Plugins/Save Coord/XML Export");
                 Game.LogTrivial("Creating \"Plugins/Save Coord/XML Export\" directory");
             }
-            else Game.LogTrivial("Directory check passed");
+            if (Directory.Exists(@"Plugins/Save Coord") && Directory.Exists(@"Plugins/Save Coord/XML Export")) Game.LogTrivial("Directory check passed");
             if (!File.Exists(@"Plugins/SaveCoordConfig.ini"))
             {
                 string[] itu = new string[]

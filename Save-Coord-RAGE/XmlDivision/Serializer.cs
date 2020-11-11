@@ -1,4 +1,5 @@
 ﻿using Rage;
+using Save_Coord_RAGE.CoordinateManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,11 +15,29 @@ namespace Save_Coord_RAGE.XmlDivision
         internal static void SerializeItems(List<Vector3> loc, List<float> heading, string filename)
         {
             if (loc == null) return;
-            List<Coordinate> Coords = new List<Coordinate>();
-            foreach (Vector3 v in loc)
+            if (loc.Count != heading.Count)
             {
-                Coordinate coord = new Coordinate();
+                return;
             }
+            GameFiber.StartNew(delegate
+            {
+                List<Coordinate> Coords = new List<Coordinate>();
+                for (int i = 0; i < loc.Count; i++)
+                {
+                    Coordinate coord = new Coordinate(); Vector3 v = loc[i]; float h = heading[i];
+                    coord.AxisX = v.X;
+                    coord.AxisY = v.Y;
+                    coord.AxisZ = v.Z;
+                    coord.Heading = h;
+                    coord.NearestStreet = World.GetStreetName(v);
+                    coord.Zone = Zones.GetZoneName(v);
+                    Coords.Add(coord);
+                    Game.DisplaySubtitle($"~g~Save Coord~w~: Exporting ({i}/{loc.Count})");
+                    if (Initialize.boostPerformance) GameFiber.Yield();
+                }
+                Serialize(Coords, filename);
+                GameFiber.Hibernate();
+            });           
         }
         internal static void Serialize(List<Coordinate> list, string filename)
         {
