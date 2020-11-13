@@ -118,13 +118,13 @@ namespace Save_Coord_RAGE.CoordinateManager
                             blip.DisableRoute();
                             blip.Delete();
                         }
+                        MenuHandler.blipExist = false;
+                        ManagerMenu.deleteAllBlips.Enabled = false;
                     }
                     if (!enableroute)
                         Game.DisplaySubtitle($"~g~Save Coord~w~: Nearest location distance is {Math.Round(nearest)} meters. " +
                             $"detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     readFileCount = 0;
-                    MenuHandler.blipExist = false;
-                    ManagerMenu.deleteAllBlips.Enabled = false;
                     GameFiber.Hibernate();
                 });
             }

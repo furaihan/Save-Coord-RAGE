@@ -68,6 +68,13 @@ namespace Save_Coord_RAGE
 
             mainMenu.RefreshIndex();
             mainMenu.OnItemSelect += MenuHandler.ItemSelectHandler;
+            mainMenu.OnMenuOpen += MainMenu_OnMenuOpen;
+        }
+
+        private static void MainMenu_OnMenuOpen(UIMenu sender)
+        {
+            fileName.Items = Alat.GetLocationGroups();
+            if (fileName.Items.Contains(MenuHandler.filename)) fileName.SelectedItem = MenuHandler.filename;
         }
     }
 }

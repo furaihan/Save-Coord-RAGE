@@ -26,6 +26,7 @@ namespace Save_Coord_RAGE.XmlDivision
                 GameFiber.StartNew(delegate
                 {
                     List<Coordinate> Coords = new List<Coordinate>();
+                    CoordManager.calculating = true;
                     for (int i = 0; i < loc.Count; i++)
                     {
                         Coordinate coord = new Coordinate(); Vector3 v = loc[i]; float h = heading[i];
@@ -47,6 +48,7 @@ namespace Save_Coord_RAGE.XmlDivision
             {
                 Game.LogTrivial($"Error while trying to export an XML file. {e.Message}");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while trying to export an XML file");
+                CoordManager.calculating = false;
                 return;
             }
         }
@@ -62,16 +64,19 @@ namespace Save_Coord_RAGE.XmlDivision
             }
             try
             {
+                CoordManager.calculating = true;
                 XmlSerializer serializer = new XmlSerializer(typeof(List<Coordinate>));
                 using (TextWriter textWriter = new StreamWriter(path, false))
                 {
                     serializer.Serialize(textWriter, list);
                 }
                 Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Exported to XML Successfully");
+                CoordManager.calculating = false;
             } catch (Exception e)
             {
                 Game.LogTrivial($"Error while trying to export an XML file. {e.Message}");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while trying to export an XML file");
+                CoordManager.calculating = false;
                 return;
             }          
         }

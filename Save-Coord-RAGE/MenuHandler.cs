@@ -57,7 +57,8 @@ namespace Save_Coord_RAGE
                 else if (selectedItem == Menu.fileName)
                 {
                     filename = Alat.GetKeyboardInput("File Name:", "", 32);
-                    Menu.fileName.SelectedItem = filename;
+                    Menu.fileName.Items.Add(filename);
+                    Menu.fileName.SelectedItem = Menu.fileName.Items[Menu.fileName.Items.IndexOf(filename)];
 
                     Menu.mainMenu.RefreshIndex();
                 }
