@@ -61,6 +61,7 @@
     <Compile Include="MenuHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDivision\Coordinate.cs" />
+    <Compile Include="XmlDivision\DeserializeExample.cs" />
     <Compile Include="XmlDivision\Serializer.cs" />
     <Compile Include="XmlDivision\XmlMenu.cs" />
   </ItemGroup>
