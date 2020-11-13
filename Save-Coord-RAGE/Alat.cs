@@ -59,7 +59,7 @@ namespace Save_Coord_RAGE
                     tw.WriteLine("This file created in [" + DateTime.Now.ToString() + "]");
                     tw.Close();
                 }
-                else if (File.Exists(path))
+                if (File.Exists(path))
                 {
                     using (var tw = new StreamWriter(path, true))
                     {
@@ -69,27 +69,26 @@ namespace Save_Coord_RAGE
                 Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your coordinate has been saved ~g~successfully");
             });
         }
-        internal static class ClientKeyboardInput
+        internal static string GetKeyboardInput(string textTitle, string boxText, int length)
         {
-            public static string GetKeyboardInput(string textTitle, string boxText, int length)
+            NativeFunction.Natives.DISABLE_ALL_CONTROL_ACTIONS(2);
+
+            NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, textTitle, 0, boxText, 0, 0, 0, length);
+            Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
+            Game.DisplaySubtitle(textTitle, 900000);
+            while (NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0)
             {
-                NativeFunction.Natives.DISABLE_ALL_CONTROL_ACTIONS(2);
-
-                NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, textTitle, 0, boxText, 0, 0, 0, length);
-                Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
-                while (NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0)
-                {
-                    GameFiber.Yield();
-                }
-                NativeFunction.Natives.ENABLE_ALL_CONTROL_ACTIONS(2);
-                Game.HideHelp();
-
-                return NativeFunction.Natives.GET_ONSCREEN_KEYBOARD_RESULT<string>();
+                GameFiber.Yield();
             }
-            private static string FormatKeyBinding(Keys modifierKey, Keys key)
-                => modifierKey == Keys.None ? $"~{key.GetInstructionalId()}~" :
-                                              $"~{modifierKey.GetInstructionalId()}~ ~+~ ~{key.GetInstructionalId()}~";
+            NativeFunction.Natives.ENABLE_ALL_CONTROL_ACTIONS(2);
+            Game.DisplaySubtitle("");
+            Game.HideHelp();
+
+            return NativeFunction.Natives.GET_ONSCREEN_KEYBOARD_RESULT<string>();
         }
+        internal static string FormatKeyBinding(Keys modifierKey, Keys key)
+            => modifierKey == Keys.None ? $"~{key.GetInstructionalId()}~" :
+                                          $"~{modifierKey.GetInstructionalId()}~ ~+~ ~{key.GetInstructionalId()}~";
         internal static void CheckDirectory()
         {
             if (!Directory.Exists(@"Plugins/Save Coord"))
@@ -105,22 +104,14 @@ namespace Save_Coord_RAGE
             if (Directory.Exists(@"Plugins/Save Coord") && Directory.Exists(@"Plugins/Save Coord/XML Export")) Game.LogTrivial("Directory check passed");
             if (!File.Exists(@"Plugins/SaveCoordConfig.ini"))
             {
-                string[] itu = new string[]
-                {
-                    "[Initialization]",
-                    "OpenMenuKey=Q",
-                    "OpenMenuModifier=LControlKey",
-                    "CheckOtherPluginMenuVisibility=false",
-                    "BoostPerformance=false"
-                };
-                var path = @"Plugins/SaveCoordConfig.ini";
-                var file = File.Create(path);
-                file.Close();
-                TextWriter tw = new StreamWriter(path);
-                foreach (string s in itu) tw.WriteLine(s);
-                tw.Close();
+                Game.LogTrivial("INI configuration file not found, using default value");
             }
             else Game.LogTrivial("INI Check Passed");
+        }
+        internal static string GetZoneName(Vector3 pos)
+        {
+            string gameName = NativeFunction.Natives.GET_NAME_OF_ZONE<string>(pos.X, pos.Y, pos.Z);
+            return Game.GetLocalizedString(gameName);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 var lines = File.ReadLines(path + filename);
                 List<string> vectorData = new List<string>();
                 int readvector = 0;
+                Menu._menuPool.CloseAllMenus();
                 foreach (string line in lines)
                 {
                     readFileCount++;
@@ -56,6 +57,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 return ret;
             } catch (Exception e)
             {
+                calculating = false;
                 Game.LogTrivial($"Error reading a file {e.Message}");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while reading a file");
                 return null;
@@ -64,6 +66,7 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static void GetNearestLocation(List<Vector3> listLocation, bool enableroute = false)
         {
             if (listLocation == null) return;
+            Menu._menuPool.CloseAllMenus();
             try
             {
                 GameFiber.StartNew(delegate
@@ -95,10 +98,12 @@ namespace Save_Coord_RAGE.CoordinateManager
                             GameFiber.Yield();
                     }
                     Game.LogTrivial("Done Calculating");
-                    Game.DisplaySubtitle($"Nearest location detected in ~g~{Zones.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}");
+                    Game.DisplaySubtitle($"Nearest location detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     calculating = false;
                     if (enableroute)
                     {
+                        MenuHandler.blipExist = true;
+                        ManagerMenu.deleteAllBlips.Enabled = true;
                         Blip blip = new Blip(nearestVec);
                         blip.Color = Color.LimeGreen;
                         blip.Scale = 0.75f;
@@ -106,7 +111,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                         while (true)
                         {
                             GameFiber.Yield();
-                            if (Game.LocalPlayer.Character.Position.DistanceTo(blip.Position) <= 8f) break;
+                            if (Game.LocalPlayer.Character.Position.DistanceTo(blip.Position) <= 8f || !MenuHandler.blipExist) break;
                         }
                         if (blip.Exists())
                         {
@@ -115,20 +120,25 @@ namespace Save_Coord_RAGE.CoordinateManager
                         }
                     }
                     if (!enableroute)
-                        Game.DisplaySubtitle($"~g~Save Coord~w~: Nearest location distance is {Math.Round(nearest)} meters", 6000);
+                        Game.DisplaySubtitle($"~g~Save Coord~w~: Nearest location distance is {Math.Round(nearest)} meters. " +
+                            $"detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     readFileCount = 0;
+                    MenuHandler.blipExist = false;
+                    ManagerMenu.deleteAllBlips.Enabled = false;
                     GameFiber.Hibernate();
                 });
             }
             catch (Exception e)
             {
+                calculating = false;
                 Game.LogTrivial($"Error while calculating a distance {e.Message}");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while while calculating a distance");
             }
         }
-        internal static List<float> GetHeadingFromFile()
+        internal static List<float> GetHeadingFromFile(string filename)
         {
-            var lines = File.ReadLines(@"C:\Users\gerai\OneDrive\Desktop\SuspiciousVehicle.txt");
+            string path = @"Plugins/Save Coord/"+ filename;
+            var lines = File.ReadLines(path);
             List<float> headingList = new List<float>();
             foreach (string line in lines)
             {

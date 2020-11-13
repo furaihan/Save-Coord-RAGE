@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LSPD_First_Response">
+      <HintPath>..\..\Dependencies\LSPD_First_Response.dll</HintPath>
+    </Reference>
     <Reference Include="RAGENativeUI">
       <HintPath>..\..\Dependencies\RAGENativeUI.dll</HintPath>
     </Reference>
@@ -52,7 +55,6 @@
     <Compile Include="Alat.cs" />
     <Compile Include="CoordinateManager\CoordManager.cs" />
     <Compile Include="CoordinateManager\ManagerMenu.cs" />
-    <Compile Include="CoordinateManager\Zones.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Menu.cs" />

@@ -16,7 +16,7 @@ namespace Save_Coord_RAGE
         internal static MenuPool _menuPool;
         internal static UIMenu mainMenu;
 
-        internal static UIMenuItem fileName;
+        internal static UIMenuListScrollerItem<string> fileName;
         internal static UIMenuCheckboxItem useHeading;
         internal static UIMenuListScrollerItem<string> entityCoordinate;
         internal static UIMenuItem confirmMenu;
@@ -27,18 +27,22 @@ namespace Save_Coord_RAGE
             mainMenu = new UIMenu("Save Coord", "Press confirm to save current coordinates")
             {
                 MouseControlsEnabled = false,
-                AllowCameraMovement = true
+                AllowCameraMovement = true,
+                WidthOffset = 200
             };
             mainMenu.SetBannerType(Color.ForestGreen);
             _menuPool.Add(mainMenu);
 
-            fileName = new UIMenuItem("Name: ")
+            CoordinateManager.ManagerMenu.locationGroup = Alat.GetLocationGroups();
+            fileName = new UIMenuListScrollerItem<string>("File Name: ", "File name of a txt file")
             {
-                BackColor = Color.White,
-                ForeColor = Color.Black,
-                HighlightedBackColor = Color.LightGray,
+                Items = CoordinateManager.ManagerMenu.locationGroup,
+                BackColor = Color.Black,
+                ForeColor = Color.WhiteSmoke,
+                HighlightedBackColor = Color.Azure,
                 HighlightedForeColor = Color.Black
             };
+
             useHeading = new UIMenuCheckboxItem("Use Heading", true)
             {
                 Enabled = false
@@ -57,9 +61,7 @@ namespace Save_Coord_RAGE
             {
                 BackColor = Color.DarkRed,
                 ForeColor = Color.White,
-                HighlightedBackColor = Color.Plum,
-                HighlightedForeColor = Color.Black,
-                LeftBadge = UIMenuItem.BadgeStyle.SilverMedal
+                LeftBadge = UIMenuItem.BadgeStyle.Barber
             };
             CoordinateManager.ManagerMenu.CreateCoordsManagerMenu();
             mainMenu.AddItems(fileName, useHeading, entityCoordinate, confirmMenu, openLocationManager);

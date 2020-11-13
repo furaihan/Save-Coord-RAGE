@@ -18,23 +18,25 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static UIMenuItem placeMarker;
         internal static UIMenuItem setRouteToNearest;
         internal static List<string> locationGroup;
+        internal static UIMenuItem deleteAllBlips;
+        internal static UIMenuItem openXmlMenu;
         internal static void CreateCoordsManagerMenu()
         {
             locationManager = new UIMenu("Coords Manager", "Manage your saved coordinates here")
             {
                 ParentMenu = Menu.mainMenu,
-                WidthOffset = 250,
+                WidthOffset = 200,
                 AllowCameraMovement = true,
                 MouseControlsEnabled = false
             };
+            locationManager.SetBannerType(Color.Maroon);
             Menu._menuPool.Add(locationManager);
-            locationGroup = Alat.GetLocationGroups();
             locationGroupFile = new UIMenuListScrollerItem<string>("Location Groups", "", locationGroup);
             refreshIndex = new UIMenuItem("Refresh", "Refresh current location group, useful if you have new location group but haven't show on list")
             {
                 LeftBadge = UIMenuItem.BadgeStyle.Alert,
-                BackColor = Color.LightGray,
-                ForeColor = Color.Black
+                BackColor = Color.Teal,
+                ForeColor = Color.WhiteSmoke
             };
             getNearestLocaionDistance = new UIMenuItem("Get Nearest Location", "Get nearest location from selected location group");
             placeMarker = new UIMenuItem("Place Marker / Checkpoint", "Place a marker or a checkpoint on every location in selected location group (Coming Soon)")
@@ -42,7 +44,16 @@ namespace Save_Coord_RAGE.CoordinateManager
                 Enabled = false
             };
             setRouteToNearest = new UIMenuItem("Enable Route on Nearest Location", "");
-            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, refreshIndex);
+            openXmlMenu = new UIMenuItem("Export to XML", "Export your saved coordinates to an XML file")
+            {
+                LeftBadge = UIMenuItem.BadgeStyle.Heart
+            };
+            deleteAllBlips = new UIMenuItem("Delete Blips", "Delete all blips created by this plugin")
+            {
+                Enabled = false,
+            };
+            XmlDivision.XmlMenu.CreateXmlMenu();
+            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, refreshIndex, deleteAllBlips ,openXmlMenu);
             Menu.mainMenu.BindMenuToItem(locationManager, Menu.openLocationManager);
             locationManager.RefreshIndex();
             locationManager.OnItemSelect += MenuHandler.ItemSelectHandler;
