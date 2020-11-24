@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Save_Coord_RAGE
 {
-    internal class Alat
+    internal static class Alat
     {
         internal static List<string> GetLocationGroups()
         {
@@ -108,7 +108,7 @@ namespace Save_Coord_RAGE
             }
             else Game.LogTrivial("INI Check Passed");
         }
-        internal static string GetZoneName(Vector3 pos)
+        internal static string GetZoneName(this Vector3 pos)
         {
             string gameName = NativeFunction.Natives.GET_NAME_OF_ZONE<string>(pos.X, pos.Y, pos.Z);
             return Game.GetLocalizedString(gameName);

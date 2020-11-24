@@ -63,7 +63,7 @@ namespace Save_Coord_RAGE
                     Menu.mainMenu.RefreshIndex();
                 }
             }
-            if (sender == ManagerMenu.locationManager)
+            else if (sender == ManagerMenu.locationManager)
             {
                 if (selectedItem == ManagerMenu.refreshIndex)
                 {
@@ -108,9 +108,39 @@ namespace Save_Coord_RAGE
                 {
                     blipExist = false;
                     Menu._menuPool.CloseAllMenus();
+                } else if (selectedItem == ManagerMenu.deleteLocation)
+                {
+                    GameFiber.StartNew(delegate
+                    {
+                        filename = ManagerMenu.locationGroupFile.SelectedItem;
+                        CoordManager.DeleteNearestLocation(filename);
+                    });                    
+                } else if (selectedItem == ManagerMenu.placeMarker)
+                {
+                    if (!CoordManager.calculating)
+                    {
+                        Menu._menuPool.CloseAllMenus();
+                        filename = ManagerMenu.locationGroupFile.SelectedItem;
+                        if (ManagerMenu.placeMarker.Text.ToLower().Contains("place"))
+                        {
+                            ManagerMenu.placeMarker.Text = "Delete Marker / Checkpoint";
+                            CoordManager.CreateCheckPoint(filename);
+                        }
+                        else if (ManagerMenu.placeMarker.Text.ToLower().Contains("delete"))
+                        {
+                            ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
+                            CoordManager.checkPointActive = false;
+                        }
+                    }
+                    else
+                    {
+                        Menu._menuPool.CloseAllMenus();
+                        Game.LogTrivial("Another calculating process is running");
+                        Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
+                    }
                 }
             }
-            if (sender == XmlMenu.xmlMenu)
+            else if (sender == XmlMenu.xmlMenu)
             {
                 if (selectedItem == XmlMenu.confirmExport)
                 {
