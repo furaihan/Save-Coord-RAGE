@@ -28,7 +28,8 @@ namespace Save_Coord_RAGE
             {
                 MouseControlsEnabled = false,
                 AllowCameraMovement = true,
-                WidthOffset = 200
+                WidthOffset = 200,
+                SubtitleBackgroundColor = Color.DarkGray
             };
             mainMenu.SetBannerType(Color.ForestGreen);
             _menuPool.Add(mainMenu);
