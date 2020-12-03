@@ -9,9 +9,9 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Save_Coord_RAGE
+namespace Save_Coord_RAGE.Menus
 {
-    class Menu
+    class MainMenu
     {
         internal static MenuPool _menuPool;
         internal static UIMenu mainMenu;
@@ -34,10 +34,10 @@ namespace Save_Coord_RAGE
             mainMenu.SetBannerType(Color.ForestGreen);
             _menuPool.Add(mainMenu);
 
-            CoordinateManager.ManagerMenu.locationGroup = Alat.GetLocationGroups();
+            ManagerMenu.locationGroup = Alat.GetLocationGroups();
             fileName = new UIMenuListScrollerItem<string>("File Name: ", "File name of a txt file")
             {
-                Items = CoordinateManager.ManagerMenu.locationGroup,
+                Items = ManagerMenu.locationGroup,
                 BackColor = Color.Black,
                 ForeColor = Color.WhiteSmoke,
                 HighlightedBackColor = Color.Azure,
@@ -64,7 +64,7 @@ namespace Save_Coord_RAGE
                 ForeColor = Color.White,
                 LeftBadge = UIMenuItem.BadgeStyle.Barber
             };
-            CoordinateManager.ManagerMenu.CreateCoordsManagerMenu();
+            ManagerMenu.CreateCoordsManagerMenu();
             mainMenu.AddItems(fileName, useHeading, entityCoordinate, confirmMenu, openLocationManager);
 
             mainMenu.RefreshIndex();

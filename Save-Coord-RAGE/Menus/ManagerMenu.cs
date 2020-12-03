@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Save_Coord_RAGE.CoordinateManager
+namespace Save_Coord_RAGE.Menus
 {
     internal class ManagerMenu
     {
@@ -25,13 +25,13 @@ namespace Save_Coord_RAGE.CoordinateManager
         {
             locationManager = new UIMenu("Coords Manager", "Manage your saved coordinates here")
             {
-                ParentMenu = Menu.mainMenu,
+                ParentMenu = MainMenu.mainMenu,
                 WidthOffset = 200,
                 AllowCameraMovement = true,
                 MouseControlsEnabled = false
             };
             locationManager.SetBannerType(Color.Maroon);
-            Menu._menuPool.Add(locationManager);
+            MainMenu._menuPool.Add(locationManager);
             locationGroupFile = new UIMenuListScrollerItem<string>("Location Groups", "", locationGroup);
             locationGroupFile.IndexChanged += (item, oldindex, newindex) =>
             {
@@ -60,9 +60,9 @@ namespace Save_Coord_RAGE.CoordinateManager
             {
                 Enabled = false,
             };
-            XmlDivision.XmlMenu.CreateXmlMenu();
+            XmlMenu.CreateXmlMenu();
             locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
-            Menu.mainMenu.BindMenuToItem(locationManager, Menu.openLocationManager);
+            MainMenu.mainMenu.BindMenuToItem(locationManager, MainMenu.openLocationManager);
             locationManager.RefreshIndex();
             locationManager.OnItemSelect += MenuHandler.ItemSelectHandler;
         }

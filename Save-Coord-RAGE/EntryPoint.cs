@@ -20,7 +20,7 @@ namespace Save_Coord_RAGE
                 Game.DisplayNotification("CHAR_SOCIAL_CLUB", "CHAR_SOCIAL_CLUB", "Save Coord", "~g~Success", "Save Coord Plugin loaded ~g~successfully");
                 Alat.CheckDirectory();
                 Initialize.IniValue();
-                Menu.CreateMenu();
+                Menus.MainMenu.CreateMenu();
                 MenuHandler.MenuLoop();
             });
         }

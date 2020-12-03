@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Save_Coord_RAGE.CoordinateManager;
 using Save_Coord_RAGE.XmlDivision;
+using Save_Coord_RAGE.Menus;
 using System.IO;
 
 namespace Save_Coord_RAGE
@@ -19,21 +20,21 @@ namespace Save_Coord_RAGE
         public static bool blipExist = false;
         internal static void ItemSelectHandler(UIMenu sender, UIMenuItem selectedItem, int index)
         {
-            if (sender == Menu.mainMenu)
+            if (sender == MainMenu.mainMenu)
             {
-                if (selectedItem == Menu.confirmMenu)
+                if (selectedItem == MainMenu.confirmMenu)
                 {
-                    filename = Menu.fileName.SelectedItem;
+                    filename = MainMenu.fileName.SelectedItem;
                     Entity toSave;
                     sender.Close();
                     try
                     {
                         toSave = Game.LocalPlayer.Character;
-                        if (Menu.entityCoordinate.Index == 1 && Game.LocalPlayer.Character.CurrentVehicle.Exists())
+                        if (MainMenu.entityCoordinate.Index == 1 && Game.LocalPlayer.Character.CurrentVehicle.Exists())
                         {
                             toSave = Game.LocalPlayer.Character.CurrentVehicle;
                         }
-                        if (Menu.useHeading.Checked)
+                        if (MainMenu.useHeading.Checked)
                         {
                             Alat.OutputFile(toSave.Position, filename, toSave.Heading);
                         }
@@ -46,7 +47,7 @@ namespace Save_Coord_RAGE
                         Game.LogTrivial("Coordinate manager menu changed");
                         ManagerMenu.locationGroupFile.Items = ManagerMenu.locationGroup;
                         Game.LogTrivial("XML Export menu changed");
-                        Menu.fileName.Items = ManagerMenu.locationGroup;
+                        MainMenu.fileName.Items = ManagerMenu.locationGroup;
                     }
                     catch (Exception e)
                     {
@@ -54,20 +55,20 @@ namespace Save_Coord_RAGE
                         Game.DisplayNotification("~r~Export Coordinates Error: ~w~" + e.Message);
                     }
                 }
-                else if (selectedItem == Menu.fileName)
+                else if (selectedItem == MainMenu.fileName)
                 {
                     filename = Alat.GetKeyboardInput("File Name:", "", 32);
-                    Menu.fileName.Items.Add(filename);
-                    Menu.fileName.SelectedItem = Menu.fileName.Items[Menu.fileName.Items.IndexOf(filename)];
+                    MainMenu.fileName.Items.Add(filename);
+                    MainMenu.fileName.SelectedItem = MainMenu.fileName.Items[MainMenu.fileName.Items.IndexOf(filename)];
 
-                    Menu.mainMenu.RefreshIndex();
+                    MainMenu.mainMenu.RefreshIndex();
                 }
             }
             else if (sender == ManagerMenu.locationManager)
             {
                 if (selectedItem == ManagerMenu.refreshIndex)
                 {
-                    Menu._menuPool.CloseAllMenus();
+                    MainMenu._menuPool.CloseAllMenus();
                     ManagerMenu.locationGroup = Alat.GetLocationGroups();
                     ManagerMenu.locationGroupFile.Items = ManagerMenu.locationGroup;
                 }
@@ -75,7 +76,7 @@ namespace Save_Coord_RAGE
                 {
                     if (!CoordManager.calculating)
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         CoordManager.calculating = true;
                         //Game.DisplayNotification("CHAR_MP_DETONATEPHONE", "CHAR_MP_DETONATEPHONE", "Save Coord", "~y~Calculating...", "Calculating is in ~g~progress");
                         var toCount = CoordManager.GetVector3FromFile(ManagerMenu.locationGroupFile.SelectedItem);
@@ -83,7 +84,7 @@ namespace Save_Coord_RAGE
                     }
                     else
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
@@ -92,7 +93,7 @@ namespace Save_Coord_RAGE
                 {
                     if (!CoordManager.calculating)
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         CoordManager.calculating = true;
                         //Game.DisplayNotification("CHAR_MP_DETONATEPHONE", "CHAR_MP_DETONATEPHONE", "Save Coord", "~y~Calculating...", "Calculating is in ~g~progress");
                         var toCount = CoordManager.GetVector3FromFile(ManagerMenu.locationGroupFile.SelectedItem);
@@ -100,14 +101,14 @@ namespace Save_Coord_RAGE
                     }
                     else
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
                 } else if (selectedItem == ManagerMenu.deleteAllBlips)
                 {
                     blipExist = false;
-                    Menu._menuPool.CloseAllMenus();
+                    MainMenu._menuPool.CloseAllMenus();
                 } else if (selectedItem == ManagerMenu.deleteLocation)
                 {
                     GameFiber.StartNew(delegate
@@ -119,7 +120,7 @@ namespace Save_Coord_RAGE
                 {
                     if (!CoordManager.calculating)
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         filename = ManagerMenu.locationGroupFile.SelectedItem;
                         if (ManagerMenu.placeMarker.Text.ToLower().Contains("place"))
                         {
@@ -134,7 +135,7 @@ namespace Save_Coord_RAGE
                     }
                     else
                     {
-                        Menu._menuPool.CloseAllMenus();
+                        MainMenu._menuPool.CloseAllMenus();
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
@@ -144,7 +145,7 @@ namespace Save_Coord_RAGE
             {
                 if (selectedItem == XmlMenu.confirmExport)
                 {
-                    Menu._menuPool.CloseAllMenus();
+                    MainMenu._menuPool.CloseAllMenus();
                     xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", "", 32);
                     if (File.Exists(@"Plugins/Save Coord/XML Export/" + xmlFileName) && !XmlMenu.allowOverwrite.Checked)
                     {
@@ -162,20 +163,20 @@ namespace Save_Coord_RAGE
             while (true)
             {
                 GameFiber.Yield();
-                Menu._menuPool.ProcessMenus();
+                MainMenu._menuPool.ProcessMenus();
                 if (Alat.CheckKey(Initialize.modifier, Initialize.menuKey))
                 {
-                    if (Menu._menuPool.IsAnyMenuOpen()) Menu._menuPool.CloseAllMenus();
+                    if (MainMenu._menuPool.IsAnyMenuOpen()) MainMenu._menuPool.CloseAllMenus();
                     else if (Initialize.checkVisibility)
                     {
-                        if (!UIMenu.IsAnyMenuVisible) Menu.mainMenu.Visible = true;
+                        if (!UIMenu.IsAnyMenuVisible) MainMenu.mainMenu.Visible = true;
                         else if (UIMenu.IsAnyMenuVisible)
                         {
-                            Menu.mainMenu.Visible = false;
+                            MainMenu.mainMenu.Visible = false;
                             Game.LogTrivial("Other plugin menu is already opened");
                         }
                     }
-                    else if (!Initialize.checkVisibility) Menu.mainMenu.Visible = true;
+                    else if (!Initialize.checkVisibility) MainMenu.mainMenu.Visible = true;
                 }
             }
         }

@@ -53,17 +53,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alat.cs" />
+    <Compile Include="CoordinateManager\CheckPoint.cs" />
     <Compile Include="CoordinateManager\CoordManager.cs" />
-    <Compile Include="CoordinateManager\ManagerMenu.cs" />
+    <Compile Include="Menus\ManagerMenu.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Initialize.cs" />
-    <Compile Include="Menu.cs" />
+    <Compile Include="Menus\MainMenu.cs" />
     <Compile Include="MenuHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDivision\Coordinate.cs" />
     <Compile Include="XmlDivision\DeserializeExample.cs" />
     <Compile Include="XmlDivision\Serializer.cs" />
-    <Compile Include="XmlDivision\XmlMenu.cs" />
+    <Compile Include="Menus\XmlMenu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

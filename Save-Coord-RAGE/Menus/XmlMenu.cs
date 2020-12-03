@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Save_Coord_RAGE.XmlDivision
+namespace Save_Coord_RAGE.Menus
 {
     internal class XmlMenu
     {
@@ -20,14 +20,14 @@ namespace Save_Coord_RAGE.XmlDivision
         {
             xmlMenu = new UIMenu("XML Export", "Export your saved coordinates to an xml file")
             {
-                ParentMenu = CoordinateManager.ManagerMenu.locationManager,
+                ParentMenu = ManagerMenu.locationManager,
                 WidthOffset = 200,
                 MouseControlsEnabled = false,
                 AllowCameraMovement = true,
                 SubtitleBackgroundColor = Color.DarkGray
             };
             xmlMenu.SetBannerType(Color.Indigo);
-            Menu._menuPool.Add(xmlMenu);
+            MainMenu._menuPool.Add(xmlMenu);
             locationToExport = new UIMenuListScrollerItem<string>("Location File to Export", "Choose a location file that you want to export", Alat.GetLocationGroups());
             locationToExport.IndexChanged += (item, oldIndex, newIndex) =>
             {
@@ -47,7 +47,7 @@ namespace Save_Coord_RAGE.XmlDivision
                 LeftBadge = UIMenuItem.BadgeStyle.Star
             };
             xmlMenu.AddItems(locationToExport, allowOverwrite, confirmExport);
-            CoordinateManager.ManagerMenu.locationManager.BindMenuToItem(xmlMenu, CoordinateManager.ManagerMenu.openXmlMenu);
+            ManagerMenu.locationManager.BindMenuToItem(xmlMenu, ManagerMenu.openXmlMenu);
             xmlMenu.RefreshIndex();
             xmlMenu.OnItemSelect += MenuHandler.ItemSelectHandler;
         }

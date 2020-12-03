@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Save_Coord_RAGE.Menus;
 
 namespace Save_Coord_RAGE.CoordinateManager
 {
@@ -25,7 +26,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 var lines = File.ReadLines(path + filename);
                 List<string> vectorData = new List<string>();
                 int readvector = 0;
-                Menu._menuPool.CloseAllMenus();
+                MainMenu._menuPool.CloseAllMenus();
                 foreach (string line in lines)
                 {
                     readFileCount++;
@@ -67,7 +68,7 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static void GetNearestLocation(List<Vector3> listLocation, bool enableroute = false)
         {
             if (listLocation == null) return;
-            Menu._menuPool.CloseAllMenus();
+            MainMenu._menuPool.CloseAllMenus();
             try
             {
                 GameFiber.StartNew(delegate
@@ -146,7 +147,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 var lines = File.ReadLines(path);
                 List<string> vectorData = new List<string>();
                 int readvector = 0;
-                Menu._menuPool.CloseAllMenus();
+                MainMenu._menuPool.CloseAllMenus();
                 foreach (string line in lines)
                 {
                     readFileCount++;
@@ -255,7 +256,6 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static bool checkPointActive = false;
         internal static void CreateCheckPoint(string filename)
         {
-            ulong DOES_ENTITY_EXIST = 0x7239B21A38F536BA;
             GameFiber.StartNew(delegate
             {
                 try
@@ -270,7 +270,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                         GameFiber.Yield();
                         Game.DisplaySubtitle($"Placing marker / checkpoint on 50 nearby locations ({locations.IndexOf(location) + 1}/{locations.Count})");
                         checkpoint = NativeFunction.Natives.CREATE_CHECKPOINT<int>(46, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, 0, 255, 0, 255, 0);
-                        NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, 25f, 25f, 2f);
+                        NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, 35f, 35f, 2.5f);
                         listCP.Add(checkpoint);
                     }
                     calculating = false;
@@ -315,12 +315,14 @@ namespace Save_Coord_RAGE.CoordinateManager
                         {
                             Game.LogTrivial("Exception failed");
                             Game.LogTrivial(w.Message);
+                            Game.LogTrivial(w.ToString());
                         }                      
                     }
                     calculating = false;
                     listCP = new List<int>();
                     Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "An error occured while creating checkpoint");
                     Game.LogTrivial(e.Message);
+                    Game.LogTrivial(e.ToString());
                 }
             });            
         }
