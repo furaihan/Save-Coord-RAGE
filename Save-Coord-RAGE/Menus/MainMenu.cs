@@ -24,12 +24,14 @@ namespace Save_Coord_RAGE.Menus
         internal static void CreateMenu()
         {
             _menuPool = new MenuPool();
+            TextStyle title = new TextStyle(TextFont.Pricedown, Color.Ivory, 1.125f, TextJustification.Center);
             mainMenu = new UIMenu("Save Coord", "Press confirm to save current coordinates")
             {
                 MouseControlsEnabled = false,
                 AllowCameraMovement = true,
                 WidthOffset = 200,
-                SubtitleBackgroundColor = Color.DarkGray
+                SubtitleBackgroundColor = Color.Navy,
+                TitleStyle = title
             };
             mainMenu.SetBannerType(Color.ForestGreen);
             _menuPool.Add(mainMenu);

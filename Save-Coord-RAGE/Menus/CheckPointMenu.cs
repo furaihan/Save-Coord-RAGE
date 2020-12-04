@@ -1,0 +1,155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Drawing;
+using System.Reflection;
+using Rage;
+using RAGENativeUI;
+using RAGENativeUI.Elements;
+using Save_Coord_RAGE.CoordinateManager;
+
+namespace Save_Coord_RAGE.Menus
+{
+    internal class CheckPointMenu
+    {
+        internal static UIMenu checkPointMenu;
+        internal static UIMenuListScrollerItem<string> locationGroup;
+        internal static UIMenuNumericScrollerItem<int> cpNumber;
+        internal static UIMenuNumericScrollerItem<float> cpHeight;
+        internal static UIMenuNumericScrollerItem<float> cpRadius;
+        internal static UIMenuListScrollerItem<string> type;
+        internal static UIMenuListScrollerItem<string> color;
+        internal static UIMenuNumericScrollerItem<byte> rColor;
+        internal static UIMenuNumericScrollerItem<byte> gColor;
+        internal static UIMenuNumericScrollerItem<byte> bColor;
+        internal static UIMenuNumericScrollerItem<byte> aColor;
+        internal static UIMenuItem deleteCheckpoint;
+        internal static UIMenuItem confirm;
+        internal static List<UIMenuItem> argb = new List<UIMenuItem>()
+        {
+            rColor, gColor, bColor, aColor
+        };
+
+        internal static int cpAmount = 50;
+        internal static float height = 35;
+        internal static float radius = 2.5f;
+        internal static CheckPoint.CheckPointType pointType = CheckPoint.CheckPointType.Cyclinder3;
+        internal static Color CpColor = Color.Green;
+        internal static void CreateMenu()
+        {            
+            PropertyInfo[] colour = typeof(Color).GetProperties(BindingFlags.Static | BindingFlags.DeclaredOnly | BindingFlags.Public);
+            List<string> colors = new List<string>();
+            colour.ToList().ForEach(c =>
+            {
+                colors.Add(c.Name);
+            });
+            colors.Add("Custom Color");
+            //colors.ForEach(a => a.ToLog());
+
+            List<string> cpTypes = Enum.GetNames(typeof(CheckPoint.CheckPointType)).ToList();         
+
+            string[] eVehs = (from x in Model.VehicleModels.ToList().Where(m => m.IsEmergencyVehicle) select x.Name).ToArray();
+
+            TextStyle menuBanner = new TextStyle(TextFont.HouseScript, Color.Gold, 1.025f, TextJustification.Center);
+            checkPointMenu = new UIMenu("Place CheckPoint", "Place some Checkpoint on nearby locations")
+            {
+                WidthOffset = 200,
+                AllowCameraMovement = true,
+                MouseControlsEnabled = false,
+                ParentMenu = ManagerMenu.locationManager,
+                ParentItem = ManagerMenu.placeMarker,
+                TitleStyle = menuBanner
+            };
+            checkPointMenu.SetBannerType(Color.SaddleBrown);
+
+            locationGroup = new UIMenuListScrollerItem<string>("Location Group", "Select which location group to place checkpoint nearby", Alat.GetLocationGroups());
+
+            cpNumber = new UIMenuNumericScrollerItem<int>("CheckPoint Amount", "Place checkpionts on 50 nearby location from player", 5, 60, 5)
+            {
+                Value = 50,
+            };
+            cpNumber.IndexChanged += (item, oldindex, newIndex) =>
+            {
+                cpNumber.Description = $"Place checkpionts on {cpNumber.Value} nearby location from player";
+                cpAmount = cpNumber.Value;
+            };
+
+            cpHeight = new UIMenuNumericScrollerItem<float>("CheckPoint Height", "Adjust the height of the check point to be placed", 5, 100, 5);
+            cpHeight.Value = 35;
+            cpHeight.IndexChanged += (item, oldIOndex, newIndex) => height = cpHeight.Value;
+
+            cpRadius = new UIMenuNumericScrollerItem<float>("CheckPoint Radius", "Adjust the radius of the check point to be placed", 1.5f, 10f, 0.5f);
+            cpRadius.Value = 2.5f;
+            cpRadius.IndexChanged += (item, oldIOndex, newIndex) => radius = cpRadius.Value;
+
+            type = new UIMenuListScrollerItem<string>("CheckPoint Type", "Set the checkpoint icon", cpTypes);
+            if (type.Items.Contains("Cyclinder3")) type.SelectedItem = type.Items[type.Items.IndexOf("Cyclinder3")];
+            type.IndexChanged += (item, oldIOndex, newIndex) =>
+            {
+                if (Enum.TryParse(type.SelectedItem, out CheckPoint.CheckPointType selectedType)) pointType = selectedType;
+                else Game.DisplayNotification($"~r~CheckPoint Type parse error ==> {type.SelectedItem}");
+            };
+
+            rColor = new UIMenuNumericScrollerItem<byte>("Red Value", "Adjust the red value of the color", 0, 255, 1); rColor.Value = 0; rColor.ForeColor = Color.Red;
+            gColor = new UIMenuNumericScrollerItem<byte>("Green Value", "Adjust the green value of the color", 0, 255, 1); gColor.Value = 0; gColor.ForeColor = Color.Green;
+            bColor = new UIMenuNumericScrollerItem<byte>("Blue Value", "Adjust the blue value of the color", 0, 255, 1); bColor.Value = 0; bColor.ForeColor = Color.Blue;
+            aColor = new UIMenuNumericScrollerItem<byte>("Alpha Value", "Adjust the alpha value of the color", 0, 255, 1); aColor.Value = 255; aColor.ForeColor = Color.Snow;
+            color = new UIMenuListScrollerItem<string>("CheckPoint Color", "Set the color of the checkpoint that will be placed", colors);
+            if (color.Items.Contains("Green")) color.SelectedItem = color.Items[color.Items.IndexOf("Green")];
+            color.IndexChanged += (item, oldIOndex, newIndex) =>
+            {
+                bool refresh = false;
+                if (color.SelectedItem == "Custom Color")
+                {
+                    if (checkPointMenu.MenuItems.Contains(confirm)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(confirm)); }
+                    if (checkPointMenu.MenuItems.Contains(deleteCheckpoint)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(deleteCheckpoint)); }
+                    checkPointMenu.RefreshIndex();
+                    if (!checkPointMenu.MenuItems.Contains(rColor)) { checkPointMenu.AddItem(rColor); }
+                    if (!checkPointMenu.MenuItems.Contains(gColor)) { checkPointMenu.AddItem(gColor); }
+                    if (!checkPointMenu.MenuItems.Contains(bColor)) { checkPointMenu.AddItem(bColor); }
+                    if (!checkPointMenu.MenuItems.Contains(aColor)) { checkPointMenu.AddItem(aColor); }
+                    if (!checkPointMenu.MenuItems.Contains(confirm)) { checkPointMenu.AddItem(confirm); }
+                    checkPointMenu.RefreshIndex();
+                    checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);
+                    color.Description = "Customize your own checkpoint color, change the RGBA value below (Valid values are 0 - 255)";                   
+                }
+                else if (color.SelectedItem != "Custom Color")
+                {
+                    if (checkPointMenu.MenuItems.Contains(rColor)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(rColor)); refresh = true; }
+                    if (checkPointMenu.MenuItems.Contains(gColor)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(gColor)); refresh = true; }
+                    if (checkPointMenu.MenuItems.Contains(bColor)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(bColor)); refresh = true; }
+                    if (checkPointMenu.MenuItems.Contains(aColor)) { checkPointMenu.RemoveItemAt(checkPointMenu.MenuItems.IndexOf(aColor)); refresh = true; }
+                    if (refresh)
+                    {
+                        checkPointMenu.RefreshIndex();
+                        checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);
+                        color.Description = "Set the color of the checkpoint that will be placed";
+                    }
+                    if (Enum.TryParse(color.SelectedItem, true, out KnownColor outcolor))
+                    {
+                        CpColor = Color.FromKnownColor(outcolor);
+                    }
+                    else Game.DisplayNotification($"~r~Color Parsing Error ==> {color.SelectedItem}");
+                }
+            };
+
+            deleteCheckpoint = new UIMenuItem("Delete All Available CheckPoint");
+
+            confirm = new UIMenuItem("Confirm", "Confirm your selection and placing checkpoint")
+            {
+                BackColor = Color.MidnightBlue,
+                ForeColor = Color.Honeydew,
+                LeftBadge = UIMenuItem.BadgeStyle.Star
+            };
+            checkPointMenu.AddItems(locationGroup, cpNumber, cpHeight, cpRadius, type, color, deleteCheckpoint , confirm);
+            checkPointMenu.RefreshIndex();
+
+            MainMenu._menuPool.Add(checkPointMenu);
+            ManagerMenu.locationManager.BindMenuToItem(checkPointMenu, ManagerMenu.placeMarker);
+            checkPointMenu.OnItemSelect += MenuHandler.ItemSelectHandler;
+            //checkPointMenu.MenuItems.ForEach(a => a.Text.ToLog());
+        }
+    }
+}

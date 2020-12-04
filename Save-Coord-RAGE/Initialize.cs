@@ -21,8 +21,7 @@ namespace Save_Coord_RAGE
             Game.LogTrivial($"Open Menu Key : {menuKey}");
             Game.LogTrivial($"Modifier Key : {modifier}");
             Game.LogTrivial($"Check other plugin menu visibility {checkVisibility}");
-            Game.LogTrivial($"Boost Performance : {boostPerformance}");
-            
+            Game.LogTrivial($"Boost Performance : {boostPerformance}");           
         }
     }
 }

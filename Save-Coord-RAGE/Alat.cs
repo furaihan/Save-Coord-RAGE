@@ -28,10 +28,9 @@ namespace Save_Coord_RAGE
             if (!keyboarInputCheck)
             {
                 if (Game.IsKeyDown(key) && modifierKey == Keys.None) return true;
-                else if (Game.IsKeyDownRightNow(modifierKey) && Game.IsKeyDown(key)) return true;
-                else return false;
+                if (Game.IsKeyDownRightNow(modifierKey) && Game.IsKeyDown(key)) return true;
             }
-            else return false;
+            return false;
         }
         internal static void OutputFile(Vector3 position, string filename, float heading = 0)
         {
@@ -109,9 +108,12 @@ namespace Save_Coord_RAGE
             else Game.LogTrivial("INI Check Passed");
         }
         internal static string GetZoneName(this Vector3 pos)
-        {
+        {           
             string gameName = NativeFunction.Natives.GET_NAME_OF_ZONE<string>(pos.X, pos.Y, pos.Z);
             return Game.GetLocalizedString(gameName);
         }
+        internal static bool IsNumeric(this string s) => int.TryParse(s, out _);
+        internal static bool IsByteNumeric(this string s) => byte.TryParse(s, out _);
+        internal static void ToLog(this string msg) => Game.LogTrivial(msg);
     }
 }

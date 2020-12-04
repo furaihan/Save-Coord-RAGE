@@ -230,6 +230,7 @@ namespace Save_Coord_RAGE.CoordinateManager
         {
             try
             {
+                string output = string.Empty;
                 int count = 0;
                 Vector3 nearest = GetNearestLocation(filename);
                 string path = @"Plugins/Save Coord/" + filename;
@@ -239,8 +240,13 @@ namespace Save_Coord_RAGE.CoordinateManager
                     {
                         count++;
                         Game.DisplaySubtitle($"Nearest location found in {nearest.GetZoneName()} Line number: {File.ReadLines(path).ToList().IndexOf(line)}", 10000);
+                        continue;
                     }
+                    output += path + Environment.NewLine;
                 }
+                //TextWriter tw = new StreamWriter(path, false);
+                //tw.Write(output);
+                //tw.Close();
                 Game.LogTrivial($"Count is {count}");
                 calculating = false;
             }

@@ -10,6 +10,7 @@ using Save_Coord_RAGE.CoordinateManager;
 using Save_Coord_RAGE.XmlDivision;
 using Save_Coord_RAGE.Menus;
 using System.IO;
+using System.Drawing;
 
 namespace Save_Coord_RAGE
 {
@@ -68,7 +69,7 @@ namespace Save_Coord_RAGE
             {
                 if (selectedItem == ManagerMenu.refreshIndex)
                 {
-                    MainMenu._menuPool.CloseAllMenus();
+                    sender.Close(false);
                     ManagerMenu.locationGroup = Alat.GetLocationGroups();
                     ManagerMenu.locationGroupFile.Items = ManagerMenu.locationGroup;
                 }
@@ -76,7 +77,7 @@ namespace Save_Coord_RAGE
                 {
                     if (!CoordManager.calculating)
                     {
-                        MainMenu._menuPool.CloseAllMenus();
+                        sender.Close(false);
                         CoordManager.calculating = true;
                         //Game.DisplayNotification("CHAR_MP_DETONATEPHONE", "CHAR_MP_DETONATEPHONE", "Save Coord", "~y~Calculating...", "Calculating is in ~g~progress");
                         var toCount = CoordManager.GetVector3FromFile(ManagerMenu.locationGroupFile.SelectedItem);
@@ -84,7 +85,7 @@ namespace Save_Coord_RAGE
                     }
                     else
                     {
-                        MainMenu._menuPool.CloseAllMenus();
+                        sender.Close(false);
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
@@ -93,7 +94,7 @@ namespace Save_Coord_RAGE
                 {
                     if (!CoordManager.calculating)
                     {
-                        MainMenu._menuPool.CloseAllMenus();
+                        sender.Close(false);
                         CoordManager.calculating = true;
                         //Game.DisplayNotification("CHAR_MP_DETONATEPHONE", "CHAR_MP_DETONATEPHONE", "Save Coord", "~y~Calculating...", "Calculating is in ~g~progress");
                         var toCount = CoordManager.GetVector3FromFile(ManagerMenu.locationGroupFile.SelectedItem);
@@ -101,14 +102,14 @@ namespace Save_Coord_RAGE
                     }
                     else
                     {
-                        MainMenu._menuPool.CloseAllMenus();
+                        sender.Close(false);
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
                 } else if (selectedItem == ManagerMenu.deleteAllBlips)
                 {
                     blipExist = false;
-                    MainMenu._menuPool.CloseAllMenus();
+                    sender.Close(false);
                 } else if (selectedItem == ManagerMenu.deleteLocation)
                 {
                     GameFiber.StartNew(delegate
@@ -118,34 +119,34 @@ namespace Save_Coord_RAGE
                     });                    
                 } else if (selectedItem == ManagerMenu.placeMarker)
                 {
-                    if (!CoordManager.calculating)
-                    {
-                        MainMenu._menuPool.CloseAllMenus();
-                        filename = ManagerMenu.locationGroupFile.SelectedItem;
-                        if (ManagerMenu.placeMarker.Text.ToLower().Contains("place"))
-                        {
-                            ManagerMenu.placeMarker.Text = "Delete Marker / Checkpoint";
-                            CoordManager.CreateCheckPoint(filename);
-                        }
-                        else if (ManagerMenu.placeMarker.Text.ToLower().Contains("delete"))
-                        {
-                            ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
-                            CoordManager.checkPointActive = false;
-                        }
-                    }
-                    else
-                    {
-                        MainMenu._menuPool.CloseAllMenus();
-                        Game.LogTrivial("Another calculating process is running");
-                        Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
-                    }
+                    //if (!CoordManager.calculating)
+                    //{
+                    //    sender.Close(false);
+                    //    filename = ManagerMenu.locationGroupFile.SelectedItem;
+                    //    if (ManagerMenu.placeMarker.Text.ToLower().Contains("place"))
+                    //    {
+                    //        ManagerMenu.placeMarker.Text = "Delete Marker / Checkpoint";
+                    //        CoordManager.CreateCheckPoint(filename);
+                    //    }
+                    //    else if (ManagerMenu.placeMarker.Text.ToLower().Contains("delete"))
+                    //    {
+                    //        ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
+                    //        CoordManager.checkPointActive = false;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    sender.Close(false);
+                    //    Game.LogTrivial("Another calculating process is running");
+                    //    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
+                    //}
                 }
             }
             else if (sender == XmlMenu.xmlMenu)
             {
                 if (selectedItem == XmlMenu.confirmExport)
                 {
-                    MainMenu._menuPool.CloseAllMenus();
+                    sender.Close(false);
                     xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", "", 32);
                     if (File.Exists(@"Plugins/Save Coord/XML Export/" + xmlFileName) && !XmlMenu.allowOverwrite.Checked)
                     {
@@ -155,6 +156,62 @@ namespace Save_Coord_RAGE
                     List<Vector3> vectorToExport = CoordManager.GetVector3FromFile(XmlMenu.locationToExport.SelectedItem);
                     List<float> headingToExport = CoordManager.GetHeadingFromFile(XmlMenu.locationToExport.SelectedItem);
                     Serializer.SerializeItems(vectorToExport, headingToExport, xmlFileName);
+                }
+            }
+            else if (sender == CheckPointMenu.checkPointMenu)
+            {
+                if (selectedItem == CheckPointMenu.confirm)
+                {
+                    $"Location Group = {CheckPointMenu.locationGroup.SelectedItem}".ToLog();
+                    $"CheckPoint Amount = {CheckPointMenu.cpAmount}".ToLog();
+                    $"CheckPoint Height = {CheckPointMenu.height}".ToLog();
+                    $"CheckPoint Radius = {CheckPointMenu.radius}".ToLog();
+                    $"CheckPoint Type = {CheckPointMenu.pointType}".ToLog();
+                    if (CheckPointMenu.color.SelectedItem == "Custom Color")
+                    {
+                        CheckPointMenu.CpColor = Color.FromArgb(CheckPointMenu.aColor.Value, CheckPointMenu.rColor.Value, CheckPointMenu.gColor.Value, CheckPointMenu.bColor.Value);
+                    }
+                    $"CheckPoint Color = {CheckPointMenu.CpColor}".ToLog();
+                }
+                else if (selectedItem == CheckPointMenu.rColor)
+                {
+                    var rstring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.rColor.Value.ToString(), 5);
+                    if (int.TryParse(rstring, out int rValue))
+                    {
+                        if (rValue < 256 && rValue >= 0) { CheckPointMenu.rColor.Value = (byte)rValue; }
+                        else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
+                    }
+                    else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
+                }
+                else if (selectedItem == CheckPointMenu.gColor)
+                {
+                    var gstring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.gColor.Value.ToString(), 5);
+                    if (int.TryParse(gstring, out int gValue))
+                    {
+                        if (gValue < 256 && gValue >= 0) { CheckPointMenu.gColor.Value = (byte)gValue; }
+                        else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
+                    }
+                    else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
+                }
+                else if (selectedItem == CheckPointMenu.bColor)
+                {
+                    var bstring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.bColor.Value.ToString(), 5);
+                    if (int.TryParse(bstring, out int bValue))
+                    {
+                        if (bValue > 256 && bValue >= 0) { CheckPointMenu.rColor.Value = (byte)bValue; }
+                        else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
+                    }
+                    else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
+                }
+                else if (selectedItem == CheckPointMenu.aColor)
+                {
+                    var astring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.aColor.Value.ToString(), 5);
+                    if (int.TryParse(astring, out int aValue))
+                    {
+                        if (aValue < 256 && aValue >= 0) { CheckPointMenu.rColor.Value = (byte)aValue; }
+                        else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
+                    }
+                    else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
                 }
             }
         }

@@ -61,6 +61,7 @@ namespace Save_Coord_RAGE.Menus
                 Enabled = false,
             };
             XmlMenu.CreateXmlMenu();
+            CheckPointMenu.CreateMenu();
             locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
             MainMenu.mainMenu.BindMenuToItem(locationManager, MainMenu.openLocationManager);
             locationManager.RefreshIndex();
