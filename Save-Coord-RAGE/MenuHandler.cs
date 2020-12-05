@@ -43,12 +43,16 @@ namespace Save_Coord_RAGE
                         {
                             Alat.OutputFile(toSave.Position, filename);
                         }
-                        ManagerMenu.locationGroup = Alat.GetLocationGroups();
-                        XmlMenu.locationToExport.Items = ManagerMenu.locationGroup;
-                        Game.LogTrivial("Coordinate manager menu changed");
-                        ManagerMenu.locationGroupFile.Items = ManagerMenu.locationGroup;
-                        Game.LogTrivial("XML Export menu changed");
-                        MainMenu.fileName.Items = ManagerMenu.locationGroup;
+                        List<string> before = new List<string>() 
+                        { MainMenu.fileName.SelectedItem, ManagerMenu.locationGroupFile.SelectedItem,XmlMenu.locationToExport.SelectedItem, CheckPointMenu.locationGroup.SelectedItem};
+                        MainMenu.fileName.Items = Alat.GetLocationGroups();
+                        ManagerMenu.locationGroupFile.Items = Alat.GetLocationGroups();
+                        XmlMenu.locationToExport.Items = Alat.GetLocationGroups();
+                        CheckPointMenu.locationGroup.Items = Alat.GetLocationGroups();
+                        if (MainMenu.fileName.Items.Contains(before[0])) MainMenu.fileName.SelectedItem = before[0];
+                        if (ManagerMenu.locationGroupFile.Items.Contains(before[1])) ManagerMenu.locationGroupFile.SelectedItem = before[1];
+                        if (XmlMenu.locationToExport.Items.Contains(before[2])) XmlMenu.locationToExport.SelectedItem = before[2];
+                        if (CheckPointMenu.locationGroup.Items.Contains(before[3])) CheckPointMenu.locationGroup.SelectedItem = before[3];
                     }
                     catch (Exception e)
                     {
@@ -162,16 +166,35 @@ namespace Save_Coord_RAGE
             {
                 if (selectedItem == CheckPointMenu.confirm)
                 {
+                    sender.Close(false);
                     $"Location Group = {CheckPointMenu.locationGroup.SelectedItem}".ToLog();
                     $"CheckPoint Amount = {CheckPointMenu.cpAmount}".ToLog();
                     $"CheckPoint Height = {CheckPointMenu.height}".ToLog();
                     $"CheckPoint Radius = {CheckPointMenu.radius}".ToLog();
-                    $"CheckPoint Type = {CheckPointMenu.pointType}".ToLog();
+                    $"CheckPoint Type = {CheckPointMenu.pointType} -> {(int)CheckPointMenu.pointType}".ToLog();
                     if (CheckPointMenu.color.SelectedItem == "Custom Color")
                     {
                         CheckPointMenu.CpColor = Color.FromArgb(CheckPointMenu.aColor.Value, CheckPointMenu.rColor.Value, CheckPointMenu.gColor.Value, CheckPointMenu.bColor.Value);
                     }
                     $"CheckPoint Color = {CheckPointMenu.CpColor}".ToLog();
+                    var pos = Game.LocalPlayer.Character.Position + Game.LocalPlayer.Character.ForwardVector * 15f;
+                    if (CoordManager.calculating)
+                    {
+                        Game.LogTrivial("Another calculating process is running");
+                        Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
+                        return;
+                    }
+                    CoordManager.CreateCheckPoint(CheckPointMenu.locationGroup.SelectedItem, CheckPointMenu.CpColor, CheckPointMenu.radius, CheckPointMenu.height, (int)CheckPointMenu.pointType, CheckPointMenu.cpAmount);
+                    CheckPointMenu.confirm.Enabled = false;
+                    CheckPointMenu.confirm.Description = "~r~You must delete all available checkpoint before create another one";
+                    CheckPointMenu.deleteCheckpoint.Enabled = true;
+                }
+                else if (selectedItem == CheckPointMenu.deleteCheckpoint)
+                {
+                    CoordManager.checkPointActive = false;
+                    CheckPointMenu.confirm.Enabled = true;
+                    CheckPointMenu.confirm.Description = "Confirm your selection and start placing checkpoint";
+                    CheckPointMenu.deleteCheckpoint.Enabled = false;
                 }
                 else if (selectedItem == CheckPointMenu.rColor)
                 {

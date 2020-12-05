@@ -242,11 +242,12 @@ namespace Save_Coord_RAGE.CoordinateManager
                         Game.DisplaySubtitle($"Nearest location found in {nearest.GetZoneName()} Line number: {File.ReadLines(path).ToList().IndexOf(line)}", 10000);
                         continue;
                     }
-                    output += path + Environment.NewLine;
+                    output += line + Environment.NewLine;
                 }
-                //TextWriter tw = new StreamWriter(path, false);
-                //tw.Write(output);
-                //tw.Close();
+                TextWriter tw = new StreamWriter(path, false);
+                tw.Write(output);
+                tw.Close();
+                Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your coordinate has been saved ~g~successfully");
                 Game.LogTrivial($"Count is {count}");
                 calculating = false;
             }
@@ -331,6 +332,80 @@ namespace Save_Coord_RAGE.CoordinateManager
                     Game.LogTrivial(e.ToString());
                 }
             });            
+        }
+        internal static void CreateCheckPoint(string filename, Color color, float radius, float height, int type, int number)
+        {
+            GameFiber.StartNew(delegate
+            {
+                try
+                {
+                    Game.LogTrivial("Placing marker / checkpoint started");
+                    checkPointActive = true;
+                    int checkpoint = 0;
+                    List<Vector3> locations = GetVector3FromFile(filename);
+                    int actualNumber = locations.Count > number ? number : locations.Count;
+                    locations = (from x in locations orderby x.DistanceTo(Game.LocalPlayer.Character.Position) select x).Take(actualNumber).ToList();
+                    foreach (Vector3 location in locations)
+                    {
+                        GameFiber.Yield();
+                        Game.DisplaySubtitle($"Placing marker / checkpoint on {locations.Count} nearby locations ({locations.IndexOf(location) + 1}/{locations.Count})");
+                        checkpoint = NativeFunction.Natives.CREATE_CHECKPOINT<int>(type, location.X, location.Y, location.Z, location.X, location.Y, location.Z, radius, color.R, color.G, color.B, color.A, 0);
+                        NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, height, height, radius);
+                        listCP.Add(checkpoint);
+                    }
+                    calculating = false;
+                    var count = 0;
+                    while (checkPointActive)
+                    {
+                        GameFiber.Yield();
+                        count++;
+                        if (count > 100000)
+                        {
+                            ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
+                            Game.LogTrivial("Force delete all checkpoint because too long");
+                            break;
+                        }
+                    }
+                    calculating = true;
+                    foreach (int cp in listCP)
+                    {
+                        GameFiber.Yield();
+                        Game.DisplaySubtitle($"Deleting marker / checkpoint ({listCP.IndexOf(cp) + 1}/{listCP.Count})");
+                        if (NativeFunction.Natives.x7239B21A38F536BA<bool>(cp)) Game.LogTrivial($"Yes, {cp} exist");
+                        NativeFunction.Natives.DELETE_CHECKPOINT(cp);
+                    }
+                    calculating = false;
+                    listCP = new List<int>();
+                }
+                catch (Exception e)
+                {
+                    if (listCP.Count > 0)
+                    {
+                        try
+                        {
+                            calculating = true;
+                            foreach (int cp in listCP)
+                            {
+                                GameFiber.Yield();
+                                Game.DisplaySubtitle($"Deleting marker / checkpoint ({listCP.IndexOf(cp) + 1}/{listCP.Count})");
+                                if (NativeFunction.Natives.x7239B21A38F536BA<bool>(cp)) Game.LogTrivial($"Yes, {cp} exist");
+                                NativeFunction.Natives.DELETE_CHECKPOINT(cp);
+                            }
+                        }
+                        catch (Exception w)
+                        {
+                            Game.LogTrivial("Exception failed");
+                            Game.LogTrivial(w.Message);
+                            Game.LogTrivial(w.ToString());
+                        }
+                    }
+                    calculating = false;
+                    listCP = new List<int>();
+                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "An error occured while creating checkpoint");
+                    Game.LogTrivial(e.Message);
+                    Game.LogTrivial(e.ToString());
+                }
+            });
         }
     }
 }

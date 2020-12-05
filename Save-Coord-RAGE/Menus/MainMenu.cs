@@ -37,7 +37,7 @@ namespace Save_Coord_RAGE.Menus
             _menuPool.Add(mainMenu);
 
             ManagerMenu.locationGroup = Alat.GetLocationGroups();
-            fileName = new UIMenuListScrollerItem<string>("File Name: ", "File name of a txt file")
+            fileName = new UIMenuListScrollerItem<string>("File Name: ", "File name of a txt file ~g~(This field must ends with .txt extension)")
             {
                 Items = ManagerMenu.locationGroup,
                 BackColor = Color.Black,

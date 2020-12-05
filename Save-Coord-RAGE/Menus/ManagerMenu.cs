@@ -36,19 +36,21 @@ namespace Save_Coord_RAGE.Menus
             locationGroupFile.IndexChanged += (item, oldindex, newindex) =>
             {
                 getNearestLocaionDistance.Description = $"Get nearest location from {locationGroupFile.SelectedItem}";
-                placeMarker.Description = $"Place or delete a marker or a checkpoint on every location in {locationGroupFile.SelectedItem} (Coming Soon)";
+                placeMarker.Description = $"Place or delete a marker or a checkpoint on every location in {locationGroupFile.SelectedItem}. This will open a new menu to fully customize your checkpoint";
                 deleteLocation.Description = $"delete a location from {locationGroupFile.SelectedItem}";
             };
-            refreshIndex = new UIMenuItem("Refresh", "Refresh current location group, useful if you have new location group but haven't show on list")
+            refreshIndex = new UIMenuItem("Refresh", "Refresh current location group, select this if you have new location group but haven't show on list")
             {
                 LeftBadge = UIMenuItem.BadgeStyle.Alert,
                 BackColor = Color.Teal,
                 ForeColor = Color.WhiteSmoke
             };
             getNearestLocaionDistance = new UIMenuItem("Get Nearest Location", $"Get nearest location from {locationGroupFile.SelectedItem}");
+            UIMenuItem.BadgeInfo badgeInfo = new UIMenuItem.BadgeInfo("mpcarhud", "coil", Color.WhiteSmoke, sizeMultiplier: 0.75f);
             placeMarker = new UIMenuItem("Place Marker / Checkpoint", $"Place or delete a marker or a checkpoint on every location in {locationGroupFile.SelectedItem} (Coming Soon)")
             {
                 Enabled = true,
+                LeftBadgeInfo = badgeInfo
             };
             setRouteToNearest = new UIMenuItem("Enable Route on Nearest Location", "");
             deleteLocation = new UIMenuListScrollerItem<string>("Delete Location", $"delete a location from {locationGroupFile.SelectedItem}", new[] { "Nearest", "Latest"});

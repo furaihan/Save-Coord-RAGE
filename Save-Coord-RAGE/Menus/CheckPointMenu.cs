@@ -35,7 +35,7 @@ namespace Save_Coord_RAGE.Menus
         internal static int cpAmount = 50;
         internal static float height = 35;
         internal static float radius = 2.5f;
-        internal static CheckPoint.CheckPointType pointType = CheckPoint.CheckPointType.Cyclinder3;
+        internal static CheckPoint.CheckPointType pointType = CheckPoint.CheckPointType.Cylinder3;
         internal static Color CpColor = Color.Green;
         internal static void CreateMenu()
         {            
@@ -62,7 +62,7 @@ namespace Save_Coord_RAGE.Menus
                 ParentItem = ManagerMenu.placeMarker,
                 TitleStyle = menuBanner
             };
-            checkPointMenu.SetBannerType(Color.SaddleBrown);
+            checkPointMenu.SetBannerType(Color.MediumTurquoise);
 
             locationGroup = new UIMenuListScrollerItem<string>("Location Group", "Select which location group to place checkpoint nearby", Alat.GetLocationGroups());
 
@@ -85,17 +85,34 @@ namespace Save_Coord_RAGE.Menus
             cpRadius.IndexChanged += (item, oldIOndex, newIndex) => radius = cpRadius.Value;
 
             type = new UIMenuListScrollerItem<string>("CheckPoint Type", "Set the checkpoint icon", cpTypes);
-            if (type.Items.Contains("Cyclinder3")) type.SelectedItem = type.Items[type.Items.IndexOf("Cyclinder3")];
+            if (type.Items.Contains("Cylinder3")) type.SelectedItem = type.Items[type.Items.IndexOf("Cylinder3")];
             type.IndexChanged += (item, oldIOndex, newIndex) =>
             {
                 if (Enum.TryParse(type.SelectedItem, out CheckPoint.CheckPointType selectedType)) pointType = selectedType;
-                else Game.DisplayNotification($"~r~CheckPoint Type parse error ==> {type.SelectedItem}");
+                else { Game.DisplayNotification($"~r~CheckPoint Type parse error ==> {type.SelectedItem}"); Game.LogTrivial($"CheckPoint Type parsing error {type.SelectedItem}"); }
             };
 
-            rColor = new UIMenuNumericScrollerItem<byte>("Red Value", "Adjust the red value of the color", 0, 255, 1); rColor.Value = 0; rColor.ForeColor = Color.Red;
-            gColor = new UIMenuNumericScrollerItem<byte>("Green Value", "Adjust the green value of the color", 0, 255, 1); gColor.Value = 0; gColor.ForeColor = Color.Green;
-            bColor = new UIMenuNumericScrollerItem<byte>("Blue Value", "Adjust the blue value of the color", 0, 255, 1); bColor.Value = 0; bColor.ForeColor = Color.Blue;
-            aColor = new UIMenuNumericScrollerItem<byte>("Alpha Value", "Adjust the alpha value of the color", 0, 255, 1); aColor.Value = 255; aColor.ForeColor = Color.Snow;
+            rColor = new UIMenuNumericScrollerItem<byte>("Red Value", "Adjust the red value of the color", 0, 255, 1)
+            {
+                Value = 0,
+                ForeColor = Color.Red
+            }; 
+            gColor = new UIMenuNumericScrollerItem<byte>("Green Value", "Adjust the green value of the color", 0, 255, 1)
+            {
+                Value = 0,
+                ForeColor = Color.Green,
+            }; 
+            bColor = new UIMenuNumericScrollerItem<byte>("Blue Value", "Adjust the blue value of the color", 0, 255, 1)
+            {
+                Value = 0,
+                ForeColor = Color.Blue
+            }; 
+            aColor = new UIMenuNumericScrollerItem<byte>("Alpha Value", "Adjust the alpha value of the color", 0, 255, 1)
+            {
+                Value = 255,
+                ForeColor = Color.Snow
+            };
+
             color = new UIMenuListScrollerItem<string>("CheckPoint Color", "Set the color of the checkpoint that will be placed", colors);
             if (color.Items.Contains("Green")) color.SelectedItem = color.Items[color.Items.IndexOf("Green")];
             color.IndexChanged += (item, oldIOndex, newIndex) =>
@@ -110,10 +127,11 @@ namespace Save_Coord_RAGE.Menus
                     if (!checkPointMenu.MenuItems.Contains(gColor)) { checkPointMenu.AddItem(gColor); }
                     if (!checkPointMenu.MenuItems.Contains(bColor)) { checkPointMenu.AddItem(bColor); }
                     if (!checkPointMenu.MenuItems.Contains(aColor)) { checkPointMenu.AddItem(aColor); }
+                    if (!checkPointMenu.MenuItems.Contains(deleteCheckpoint)) { checkPointMenu.AddItem(deleteCheckpoint); }
                     if (!checkPointMenu.MenuItems.Contains(confirm)) { checkPointMenu.AddItem(confirm); }
                     checkPointMenu.RefreshIndex();
                     checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);
-                    color.Description = "Customize your own checkpoint color, change the RGBA value below (Valid values are 0 - 255)";                   
+                    color.Description = "Customize your own checkpoint color, change the RGBA value below ~g~(Valid values are 0 - 255)~s~";                   
                 }
                 else if (color.SelectedItem != "Custom Color")
                 {
@@ -131,13 +149,16 @@ namespace Save_Coord_RAGE.Menus
                     {
                         CpColor = Color.FromKnownColor(outcolor);
                     }
-                    else Game.DisplayNotification($"~r~Color Parsing Error ==> {color.SelectedItem}");
+                    else { Game.DisplayNotification($"~r~Color Parsing Error ==> {color.SelectedItem}"); Game.LogTrivial($"Color parsing error {color.SelectedItem}"); }
                 }
             };
 
-            deleteCheckpoint = new UIMenuItem("Delete All Available CheckPoint");
+            deleteCheckpoint = new UIMenuItem("Delete All Available CheckPoint")
+            {
+                Enabled = false
+            };
 
-            confirm = new UIMenuItem("Confirm", "Confirm your selection and placing checkpoint")
+            confirm = new UIMenuItem("Confirm", "Confirm your selection and start placing checkpoint")
             {
                 BackColor = Color.MidnightBlue,
                 ForeColor = Color.Honeydew,
