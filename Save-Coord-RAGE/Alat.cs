@@ -24,7 +24,7 @@ namespace Save_Coord_RAGE
         }
         internal static bool CheckKey(Keys modifierKey, Keys key)
         {
-            bool keyboarInputCheck = (NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0);
+            bool keyboarInputCheck = NativeFunction.CallByHash<int>(0x0CF2B696BBF945AE) == 0;
             if (!keyboarInputCheck)
             {
                 if (Game.IsKeyDown(key) && modifierKey == Keys.None) return true;
@@ -75,7 +75,7 @@ namespace Save_Coord_RAGE
             NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, textTitle, 0, boxText, 0, 0, 0, length);
             Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
             Game.DisplaySubtitle(textTitle, 900000);
-            while (NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0)
+            while (NativeFunction.CallByHash<int>(0x0CF2B696BBF945AE) == 0)
             {
                 GameFiber.Yield();
             }
@@ -115,5 +115,22 @@ namespace Save_Coord_RAGE
         internal static bool IsNumeric(this string s) => int.TryParse(s, out _);
         internal static bool IsByteNumeric(this string s) => byte.TryParse(s, out _);
         internal static void ToLog(this string msg) => Game.LogTrivial(msg);
+        internal static int CreateCheckPoint(Vector3 location) => NativeFunction.Natives.CREATE_CHECKPOINT<int>(47, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, 0, 255, 0, 255, 0);
+        internal static int CreateCheckPoint(Vector3 location, System.Drawing.Color color)
+        {
+            int r = Convert.ToInt32(color.R);
+            int g = Convert.ToInt32(color.G);
+            int b = Convert.ToInt32(color.B);
+            int a = Convert.ToInt32(color.A);
+            return NativeFunction.Natives.CREATE_CHECKPOINT<int>(47, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, r, g, b, a, 0);
+        }
+        internal static void DeleteCheckPoint(int checkpointHandle) => NativeFunction.Natives.DELETE_CHECKPOINT(checkpointHandle);
+        internal static void DeleteCheckPoints(params int[] checkPointHandle) => checkPointHandle.ToList().ForEach(cp => DeleteCheckPoint(cp));
+        internal static Random Random = new Random(MathHelper.GetRandomInteger(1000, 10000)); 
+        internal static T GetRandomElement<T>(this IEnumerable<T> list)
+        {
+            var han = list.ToList();
+            return han[Random.Next(0, han.Count - 1)];
+        }
     }
 }

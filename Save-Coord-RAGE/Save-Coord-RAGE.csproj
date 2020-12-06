@@ -56,6 +56,7 @@
     <Compile Include="CoordinateManager\CheckPoint.cs" />
     <Compile Include="CoordinateManager\CoordManager.cs" />
     <Compile Include="Menus\CheckPointMenu.cs" />
+    <Compile Include="Menus\ConfirmationMenu.cs" />
     <Compile Include="Menus\ManagerMenu.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Initialize.cs" />

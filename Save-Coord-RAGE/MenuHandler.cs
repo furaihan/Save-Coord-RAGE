@@ -221,7 +221,7 @@ namespace Save_Coord_RAGE
                     var bstring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.bColor.Value.ToString(), 5);
                     if (int.TryParse(bstring, out int bValue))
                     {
-                        if (bValue > 256 && bValue >= 0) { CheckPointMenu.rColor.Value = (byte)bValue; }
+                        if (bValue < 256 && bValue >= 0) { CheckPointMenu.bColor.Value = (byte)bValue; }
                         else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
                     }
                     else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
@@ -231,7 +231,7 @@ namespace Save_Coord_RAGE
                     var astring = Alat.GetKeyboardInput("Type a number between 0 - 255", CheckPointMenu.aColor.Value.ToString(), 5);
                     if (int.TryParse(astring, out int aValue))
                     {
-                        if (aValue < 256 && aValue >= 0) { CheckPointMenu.rColor.Value = (byte)aValue; }
+                        if (aValue < 256 && aValue >= 0) { CheckPointMenu.aColor.Value = (byte)aValue; }
                         else { Game.DisplayNotification("~r~ERROR: The value must be between 0 - 255"); }
                     }
                     else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }

@@ -67,6 +67,7 @@ namespace Save_Coord_RAGE.Menus
                 LeftBadge = UIMenuItem.BadgeStyle.Barber
             };
             ManagerMenu.CreateCoordsManagerMenu();
+            ConfirmationMenu.DeleteLocationConfirmation();
             mainMenu.AddItems(fileName, useHeading, entityCoordinate, confirmMenu, openLocationManager);
 
             mainMenu.RefreshIndex();
