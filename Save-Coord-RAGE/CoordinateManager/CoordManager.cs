@@ -56,6 +56,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                     if (Initialize.boostPerformance)
                         GameFiber.Yield();
                 }
+                readFileCount = 0;
                 return ret;
             } catch (Exception e)
             {
@@ -68,37 +69,14 @@ namespace Save_Coord_RAGE.CoordinateManager
         internal static void GetNearestLocation(List<Vector3> listLocation, bool enableroute = false)
         {
             if (listLocation == null) return;
-            MainMenu._menuPool.CloseAllMenus();
             try
             {
                 GameFiber.StartNew(delegate
                 {
                     float nearest = 0f;
                     Vector3 nearestVec = Vector3.Zero;
-                    int count = 0;
                     Vector3 playerPos = Game.LocalPlayer.Character.Position;
-                    foreach (Vector3 v in listLocation)
-                    {
-                        count++;
-                        float dis = v.DistanceTo(playerPos);
-
-                        if (count == 1)
-                        {
-                            nearest = dis;
-                            nearestVec = v;
-                        }
-                        else
-                        {
-                            if (dis < nearest)
-                            {
-                                nearest = dis;
-                                nearestVec = v;
-                            }
-                        }
-                        Game.DisplaySubtitle($"Calculating Distance ({count}/{readFileCount})");
-                        if (Initialize.boostPerformance)
-                            GameFiber.Yield();
-                    }
+                    nearestVec = (from x in listLocation orderby x.DistanceTo(playerPos) select x).FirstOrDefault();                 
                     Game.LogTrivial("Done Calculating");
                     Game.DisplaySubtitle($"Nearest location detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     calculating = false;
@@ -199,8 +177,13 @@ namespace Save_Coord_RAGE.CoordinateManager
                 if (line.StartsWith("("))
                 {
                     var result = line.Substring(line.IndexOf("),") + 2);
-                    float.TryParse(result, NumberStyles.Float, CultureInfo.InvariantCulture.NumberFormat, out float resultf);
-                    headingList.Add(resultf);
+                    if (float.TryParse(result, NumberStyles.Float, CultureInfo.InvariantCulture.NumberFormat, out float resultf))
+                        headingList.Add(resultf);
+                    else
+                    {
+                        Game.LogTrivial($"Float parse error Line:{lines.ToList().IndexOf(line)}");
+                        Game.LogTrivial(line + " ==> " + result);
+                    }
                 }
             }
             return headingList;
@@ -218,15 +201,17 @@ namespace Save_Coord_RAGE.CoordinateManager
                     if (nearest == Vector3.Zero)
                     {
                         calculating = false;
+                        DelConfirm = DeleteConfirmation.Unopened;
                         return;
                     }
                     if (nearest.DistanceTo(Game.LocalPlayer.Character) > 50f)
                     {
                         Game.DisplaySubtitle("~r~No nearest location found, ~g~make sure your distance to nearest location must be below 50 meters");
                         calculating = false;
+                        DelConfirm = DeleteConfirmation.Unopened;
                         return;
                     }
-                    Game.DisplaySubtitle("~y~The nearest location is marked with a ~g~checkpoint~y~, please ~g~confirm~y~ to ~r~delete~y~ that location");
+                    Game.DisplaySubtitle("~y~The nearest location is marked with a ~g~checkpoint~y~, please ~g~confirm~y~ to ~r~delete~y~ that location", 80000);
                     var nCp = Alat.CreateCheckPoint(nearest, Color.DeepPink);
                     ConfirmationMenu.DeleteLocation.Visible = true;
                     while (true)
@@ -234,11 +219,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                         GameFiber.Yield();
                         if (DelConfirm == DeleteConfirmation.Rejected) { GameFiber.Sleep(300); break; }
                         if (DelConfirm == DeleteConfirmation.Confirmed) { GameFiber.Sleep(300); break; }
-                        if (!ConfirmationMenu.DeleteLocation.Visible)
-                        {
-                            DelConfirm = DeleteConfirmation.Rejected;
-                            break;
-                        }
+                        if (!ConfirmationMenu.DeleteLocation.Visible) { DelConfirm = DeleteConfirmation.Rejected; break; }
                     }
                     if (DelConfirm == DeleteConfirmation.Rejected)
                     {
@@ -252,10 +233,10 @@ namespace Save_Coord_RAGE.CoordinateManager
                     string path = @"Plugins/Save Coord/" + filename;
                     foreach (string line in File.ReadLines(path))
                     {
+                        count++;
                         if (line.Contains(nearest.X.ToString()) && line.Contains(nearest.Y.ToString()) && line.Contains(nearest.Z.ToString()))
                         {
-                            count++;
-                            Game.DisplaySubtitle($"Nearest location found in ~g~{nearest.GetZoneName()}~s~ Line number: {File.ReadLines(path).ToList().IndexOf(line)}", 10000);
+                            Game.LogTrivial($"Nearest location detected in line number {count}");
                             continue;
                         }
                         output += line + Environment.NewLine;
@@ -264,7 +245,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                     tw.Write(output);
                     tw.Close();
                     Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your ~y~Nearest~s~ coordinate has been ~o~deleted~s~ ~g~successfully");
-                    Game.LogTrivial($"Count is {count}");
+                    Game.DisplaySubtitle("", 1);
                     Alat.DeleteCheckPoint(nCp);
                     DelConfirm = DeleteConfirmation.Unopened;
                     calculating = false;
@@ -307,7 +288,6 @@ namespace Save_Coord_RAGE.CoordinateManager
                         count++;
                         if (count > 100000)
                         {
-                            ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
                             Game.LogTrivial("Force delete all checkpoint because too long");
                             break;
                         }
@@ -362,27 +342,19 @@ namespace Save_Coord_RAGE.CoordinateManager
                     List<Vector3> locations = GetVector3FromFile(filename);
                     int actualNumber = locations.Count > number ? number : locations.Count;
                     locations = (from x in locations orderby x.DistanceTo(Game.LocalPlayer.Character.Position) select x).Take(actualNumber).ToList();
-                    foreach (Vector3 location in locations)
+                    foreach (Vector3 locationo in locations)
                     {
                         GameFiber.Yield();
-                        Game.DisplaySubtitle($"Placing marker / checkpoint on {locations.Count} nearby locations ({locations.IndexOf(location) + 1}/{locations.Count})");
+                        Game.DisplaySubtitle($"Placing marker / checkpoint on {locations.Count} nearby locations ({locations.IndexOf(locationo) + 1}/{locations.Count})");
+                        var location = locationo;
+                        float? zi = World.GetGroundZ(location, true, true);
+                        if (zi.HasValue) location.Z = zi.Value;
                         checkpoint = NativeFunction.Natives.CREATE_CHECKPOINT<int>(type, location.X, location.Y, location.Z, location.X, location.Y, location.Z, radius, color.R, color.G, color.B, color.A, 0);
                         NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, height, height, radius);
                         listCP.Add(checkpoint);
                     }
                     calculating = false;
-                    var count = 0;
-                    while (checkPointActive)
-                    {
-                        GameFiber.Yield();
-                        count++;
-                        if (count > 100000)
-                        {
-                            ManagerMenu.placeMarker.Text = "Place Marker / Checkpoint";
-                            Game.LogTrivial("Force delete all checkpoint because too long");
-                            break;
-                        }
-                    }
+                    GameFiber.SleepUntil(() => !checkPointActive || Alat.CheckKey(Initialize.deleteCPKey, Initialize.deleteCPModf), Initialize.cpTimeout * 60000);
                     calculating = true;
                     foreach (int cp in listCP)
                     {
@@ -390,8 +362,13 @@ namespace Save_Coord_RAGE.CoordinateManager
                         Game.DisplaySubtitle($"Deleting marker / checkpoint ({listCP.IndexOf(cp) + 1}/{listCP.Count})");
                         NativeFunction.Natives.DELETE_CHECKPOINT(cp);
                     }
+                    checkPointActive = false;
                     calculating = false;
                     listCP = new List<int>();
+                }
+                catch (ArgumentNullException e)
+                {
+                    e.ToString().ToLog();
                 }
                 catch (Exception e)
                 {
@@ -416,11 +393,35 @@ namespace Save_Coord_RAGE.CoordinateManager
                     }
                     calculating = false;
                     listCP = new List<int>();
-                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "An error occured while creating checkpoint");
+                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "There's an error while creating checkpoint");
                     Game.LogTrivial(e.Message);
                     Game.LogTrivial(e.ToString());
                 }
             });
+        }
+        internal static bool CarSpawned = false;
+        internal static void SpawnCarOnNearestLocation(string filename)
+        {
+            GameFiber.StartNew(() =>
+            {
+                CarSpawned = true;
+                var locs = GetVector3FromFile(filename);
+                var headings = GetHeadingFromFile(filename);
+                if (locs.Count != headings.Count)
+                {
+                    Game.DisplayNotification("Count is not same");
+                    return;
+                }
+                Vector3 loc = (from x in locs orderby x.DistanceTo(Game.LocalPlayer.Character) select x).FirstOrDefault();
+                float heading = headings[locs.IndexOf(loc)];
+                var veh = new Vehicle(m => m.IsCar, loc, heading);
+                var cp = Alat.CreateCheckPoint(veh.Position, Color.DarkMagenta);
+                calculating = false;
+                GameFiber.WaitUntil(() => (!veh.Exists() || Game.IsKeyDown(System.Windows.Forms.Keys.Subtract)), 1000000);
+                if (veh.Exists()) veh.Dismiss();
+                Alat.DeleteCheckPoint(cp);
+                CarSpawned = false;
+            });         
         }
     }
 }

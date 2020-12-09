@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rage;
 using System.Drawing;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
@@ -16,12 +17,12 @@ namespace Save_Coord_RAGE.Menus
         internal static UIMenuItem noDL;
         internal static void DeleteLocationConfirmation()
         {
-            DeleteLocation = new UIMenu("", "ARE YOU SURE?")
+            DeleteLocation = new UIMenu("", "ARE YOU SURE")
             {
                 AllowCameraMovement = true,
                 MouseControlsEnabled = false,
-                SubtitleStyle = new TextStyle(TextFont.Monospace, Color.Black, 0.35f, TextJustification.Left),
-                SubtitleBackgroundColor = Color.Azure
+                SubtitleStyle = new TextStyle(TextFont.Monospace, Color.Black, 0.50f, TextJustification.Left),
+                SubtitleBackgroundColor = Color.Azure,
             };
             DeleteLocation.RemoveBanner();
             yesDL = new UIMenuItem("YES, ABSOLUTELY")
@@ -30,8 +31,8 @@ namespace Save_Coord_RAGE.Menus
             };
             yesDL.Activated += (m, s) =>
             {
-                m.Close(false);
                 CoordinateManager.CoordManager.DelConfirm = CoordinateManager.CoordManager.DeleteConfirmation.Confirmed;
+                m.Close(false);
             };
             noDL = new UIMenuItem("NO, CANCEL")
             {
@@ -39,8 +40,8 @@ namespace Save_Coord_RAGE.Menus
             };
             noDL.Activated += (m, s) =>
             {
-                m.Close(false);
                 CoordinateManager.CoordManager.DelConfirm = CoordinateManager.CoordManager.DeleteConfirmation.Rejected;
+                m.Close(false);
             };
             DeleteLocation.AddItems(yesDL, noDL);
             DeleteLocation.RefreshIndex();

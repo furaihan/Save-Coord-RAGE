@@ -43,12 +43,12 @@ namespace Save_Coord_RAGE.Menus
             List<string> colors = new List<string>();
             colour.ToList().ForEach(c =>
             {
-                colors.Add(c.Name);
+                colors.Add(Alat.AddSpacesToSentence(c.Name));
             });
             colors.Add("Custom Color");
-            //colors.ForEach(a => a.ToLog());
 
-            List<string> cpTypes = Enum.GetNames(typeof(CheckPoint.CheckPointType)).ToList();
+            List<string> cpTypes = new List<string>();
+            Enum.GetNames(typeof(CheckPoint.CheckPointType)).ToList().ForEach(ty => cpTypes.Add(Alat.AddSpacesToSentence(ty)));
 
             checkPointMenu = new UIMenu("Place CheckPoint", "Place some Checkpoint on nearby locations")
             {
@@ -59,7 +59,7 @@ namespace Save_Coord_RAGE.Menus
                 ParentItem = ManagerMenu.placeMarker,
                 TitleStyle = new TextStyle(TextFont.HouseScript, Color.Aquamarine, 1.025f, TextJustification.Center)
         };
-            checkPointMenu.SetBannerType(Color.RoyalBlue);
+            checkPointMenu.SetBannerType(Color.MidnightBlue);
 
             locationGroup = new UIMenuListScrollerItem<string>("Location Group", "Select which location group to place checkpoint nearby", Alat.GetLocationGroups());
 
@@ -85,7 +85,7 @@ namespace Save_Coord_RAGE.Menus
             if (type.Items.Contains("Cylinder3")) type.SelectedItem = type.Items[type.Items.IndexOf("Cylinder3")];
             type.IndexChanged += (item, oldIOndex, newIndex) =>
             {
-                if (Enum.TryParse(type.SelectedItem, out CheckPoint.CheckPointType selectedType)) pointType = selectedType;
+                if (Enum.TryParse(type.SelectedItem.Replace(" ", ""), out CheckPoint.CheckPointType selectedType)) pointType = selectedType;
                 else { Game.DisplayNotification($"~r~CheckPoint Type parse error ==> {type.SelectedItem}"); Game.LogTrivial($"CheckPoint Type parsing error {type.SelectedItem}"); }
             };
 
@@ -110,7 +110,7 @@ namespace Save_Coord_RAGE.Menus
                 ForeColor = Color.Snow
             };
             color = new UIMenuListScrollerItem<string>("CheckPoint Color", "Set the color of the checkpoint that will be placed" +
-                $". Press ~y~RControlKey~s~ + ~y~Home~s~ to use custom color", colors);
+                $". Press ~y~RControlKey~s~ + ~y~NumPad9~s~ to use custom color", colors);
             if (color.Items.Contains("Green")) color.SelectedItem = color.Items[color.Items.IndexOf("Green")];
             color.IndexChanged += (item, oldIOndex, newIndex) =>
             {
@@ -141,9 +141,9 @@ namespace Save_Coord_RAGE.Menus
                         checkPointMenu.RefreshIndex();
                         checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);
                         color.Description = "Set the color of the checkpoint that will be placed" +
-                        $". Press ~y~RControlKey~s~ + ~y~Home~s~ to use custom color";
+                        $". Press ~y~RControlKey~s~ + ~y~NumPad9~s~ to use custom color";
                     }
-                    if (Enum.TryParse(color.SelectedItem, true, out KnownColor outcolor))
+                    if (Enum.TryParse(color.SelectedItem.Replace(" ", ""), true, out KnownColor outcolor))
                     {
                         CpColor = Color.FromKnownColor(outcolor);
                     }
@@ -162,6 +162,8 @@ namespace Save_Coord_RAGE.Menus
                 ForeColor = Color.Honeydew,
                 LeftBadge = UIMenuItem.BadgeStyle.Star
             };
+            CpColorMenu.Main();
+            checkPointMenu.BindMenuToItem(CpColorMenu.colorMenu, color);
             checkPointMenu.AddItems(locationGroup, cpNumber, cpHeight, cpRadius, type, color, deleteCheckpoint , confirm);
             checkPointMenu.RefreshIndex();
 
@@ -179,7 +181,7 @@ namespace Save_Coord_RAGE.Menus
                 while(checkPointMenu.Visible)
                 {
                     GameFiber.Yield();
-                    if (Alat.CheckKey(System.Windows.Forms.Keys.RControlKey, System.Windows.Forms.Keys.Home))
+                    if (Alat.CheckKey(System.Windows.Forms.Keys.RControlKey, System.Windows.Forms.Keys.NumPad9))
                     {
                         "Custom color keys press detected".ToLog();
                         if (color.Items.Contains("Custom Color"))

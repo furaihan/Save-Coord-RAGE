@@ -41,10 +41,10 @@ namespace Save_Coord_RAGE
                         }
                         else
                         {
-                            Alat.OutputFile(toSave.Position, filename);
+                            Alat.OutputFile(toSave.Position, filename, toSave.Heading);
                         }
-                        List<string> before = new List<string>() 
-                        { MainMenu.fileName.SelectedItem, ManagerMenu.locationGroupFile.SelectedItem,XmlMenu.locationToExport.SelectedItem, CheckPointMenu.locationGroup.SelectedItem};
+                        List<string> before = new List<string>()
+                        { MainMenu.fileName.SelectedItem, ManagerMenu.locationGroupFile.SelectedItem,XmlMenu.locationToExport.SelectedItem, CheckPointMenu.locationGroup.SelectedItem };
                         MainMenu.fileName.Items = Alat.GetLocationGroups();
                         ManagerMenu.locationGroupFile.Items = Alat.GetLocationGroups();
                         XmlMenu.locationToExport.Items = Alat.GetLocationGroups();
@@ -58,6 +58,7 @@ namespace Save_Coord_RAGE
                     {
                         Game.LogTrivial("Export Coordinates Error: " + e.Message);
                         Game.DisplayNotification("~r~Export Coordinates Error: ~w~" + e.Message);
+                        CoordManager.calculating = false;
                     }
                 }
                 else if (selectedItem == MainMenu.fileName)
@@ -237,6 +238,27 @@ namespace Save_Coord_RAGE
                     else { Game.DisplayNotification("~r~ERROR: You must type a number between 0 - 255 otherwise it will fails"); }
                 }
             }
+            else if (sender == CpColorMenu.colorMenu)
+            {
+                if (selectedItem == CpColorMenu.searchItem)
+                {
+                    string query = Alat.GetKeyboardInput("Search a color", "", 30);
+                    CpColorMenu.searchItem.RightLabel = query;
+                    CpColorMenu.searchItem.Enabled = false;
+                    var queryItems = CpColorMenu.colorMenu.MenuItems.ToList().Where(i => !i.Text.ToLower().Contains(query.ToLower()) && i != CpColorMenu.searchItem).ToList();
+                    queryItems.ForEach(t =>
+                    {
+                        CpColorMenu.colorMenu.RemoveItemAt(CpColorMenu.colorMenu.MenuItems.IndexOf(t));
+                    });
+                    CpColorMenu.colorMenu.RefreshIndex();
+                }
+                else
+                {
+                    sender.Close(true);
+                    if (CheckPointMenu.color.Items.Contains(selectedItem.Text)) CheckPointMenu.color.SelectedItem = selectedItem.Text;
+                    else { "Selected color is not available in CheckPointMenu".ToLog(); $"Selected: {selectedItem.Text}".ToLog(); }
+                }
+            }
         }
         internal static void MenuLoop()
         {
@@ -257,6 +279,10 @@ namespace Save_Coord_RAGE
                         }
                     }
                     else if (!Initialize.checkVisibility) MainMenu.mainMenu.Visible = true;
+                }
+                if (Alat.CheckKey(System.Windows.Forms.Keys.NumPad7, System.Windows.Forms.Keys.NumPad4) && !CoordManager.CarSpawned)
+                {
+                    CoordManager.SpawnCarOnNearestLocation(ManagerMenu.locationGroupFile.SelectedItem);
                 }
             }
         }

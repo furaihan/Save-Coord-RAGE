@@ -45,5 +45,18 @@ namespace Save_Coord_RAGE.XmlDivision
                 streets.Add(street);
             }
         }
+        public static void GetDataFromXml(string filename, out List<Vector3> locations, out List<float> headings)
+        {
+            locations = new List<Vector3>();
+            headings = new List<float>();         
+            var outVar = Deserialize(@"Plugins/Save Coord/XML Export" + filename);
+            foreach (Coordinate c in outVar)
+            {
+                Vector3 location = new Vector3(c.AxisX, c.AxisY, c.AxisZ);
+                float heading = c.Heading;
+                locations.Add(location);
+                headings.Add(heading);
+            }
+        }
     }
 }
