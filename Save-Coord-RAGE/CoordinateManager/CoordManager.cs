@@ -73,7 +73,6 @@ namespace Save_Coord_RAGE.CoordinateManager
             {
                 GameFiber.StartNew(delegate
                 {
-                    float nearest = 0f;
                     Vector3 nearestVec = Vector3.Zero;
                     Vector3 playerPos = Game.LocalPlayer.Character.Position;
                     nearestVec = (from x in listLocation orderby x.DistanceTo(playerPos) select x).FirstOrDefault();                 
@@ -102,7 +101,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                         ManagerMenu.deleteAllBlips.Enabled = false;
                     }
                     if (!enableroute)
-                        Game.DisplaySubtitle($"~g~Save Coord~w~: Nearest location distance is {Math.Round(nearest)} meters. " +
+                        Game.DisplaySubtitle($"~g~Save Coord~w~: Nearest location distance is {Math.Round(nearestVec.DistanceTo(Game.LocalPlayer.Character))} meters. " +
                             $"detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     readFileCount = 0;
                     GameFiber.Hibernate();
@@ -157,11 +156,13 @@ namespace Save_Coord_RAGE.CoordinateManager
                 Vector3 nearestVec = Vector3.Zero;
                 nearestVec = (from x in ret orderby x.DistanceTo(playerPos) select x).FirstOrDefault();
                 Game.LogTrivial($"Orderby Distance {Math.Round(nearestVec.DistanceTo(playerPos))}");
+                calculating = false;
                 return nearestVec;
             }
             catch (Exception e)
             {
                 Game.LogTrivial("Get nearest location error");
+                calculating = false;
                 //Game.LogTrivial(e.Message);
                 Game.LogTrivial(e.ToString());
                 return Vector3.Zero;
@@ -345,16 +346,20 @@ namespace Save_Coord_RAGE.CoordinateManager
                     foreach (Vector3 locationo in locations)
                     {
                         GameFiber.Yield();
-                        Game.DisplaySubtitle($"Placing marker / checkpoint on {locations.Count} nearby locations ({locations.IndexOf(locationo) + 1}/{locations.Count})");
+                        Game.DisplaySubtitle($"Placing marker / checkpoint on {locations.Count} nearby locations ({locations.IndexOf(locationo) + 1}/{locations.Count})~n~" +
+                            $"Checkpoint Color: {CheckPointMenu.color.SelectedItem.GetColorHexForHUD(color)}");
                         var location = locationo;
-                        float? zi = World.GetGroundZ(location, true, true);
-                        if (zi.HasValue) location.Z = zi.Value;
+                        if (CheckPointMenu.placeOnGround.Checked)
+                        {
+                            float? zi = World.GetGroundZ(location, true, true);
+                            if (zi.HasValue) location.Z = zi.Value;
+                        }
                         checkpoint = NativeFunction.Natives.CREATE_CHECKPOINT<int>(type, location.X, location.Y, location.Z, location.X, location.Y, location.Z, radius, color.R, color.G, color.B, color.A, 0);
                         NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, height, height, radius);
                         listCP.Add(checkpoint);
                     }
                     calculating = false;
-                    GameFiber.SleepUntil(() => !checkPointActive || Alat.CheckKey(Initialize.deleteCPKey, Initialize.deleteCPModf), Initialize.cpTimeout * 60000);
+                    GameFiber.SleepUntil(() => !checkPointActive || Alat.CheckKey(Initialize.deleteCPModf, Initialize.deleteCPKey), Initialize.cpTimeout * 60000);
                     calculating = true;
                     foreach (int cp in listCP)
                     {

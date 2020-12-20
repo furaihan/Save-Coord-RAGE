@@ -20,6 +20,7 @@ namespace Save_Coord_RAGE.Menus
         internal static UIMenuNumericScrollerItem<float> cpHeight;
         internal static UIMenuNumericScrollerItem<float> cpRadius;
         internal static UIMenuListScrollerItem<string> type;
+        internal static UIMenuCheckboxItem placeOnGround;
         internal static UIMenuListScrollerItem<string> color;
         internal static UIMenuNumericScrollerItem<byte> rColor;
         internal static UIMenuNumericScrollerItem<byte> gColor;
@@ -88,6 +89,8 @@ namespace Save_Coord_RAGE.Menus
                 if (Enum.TryParse(type.SelectedItem.Replace(" ", ""), out CheckPoint.CheckPointType selectedType)) pointType = selectedType;
                 else { Game.DisplayNotification($"~r~CheckPoint Type parse error ==> {type.SelectedItem}"); Game.LogTrivial($"CheckPoint Type parsing error {type.SelectedItem}"); }
             };
+
+            placeOnGround = new UIMenuCheckboxItem("Place On Ground", true, "If checked, our system is trying to find the ground position in every checkpoint location ~o~(May need slower process)~s~");
 
             rColor = new UIMenuNumericScrollerItem<byte>("Red Value", "Adjust the red value of the color", 0, 255, 1)
             {
@@ -160,11 +163,13 @@ namespace Save_Coord_RAGE.Menus
             {
                 BackColor = Color.MidnightBlue,
                 ForeColor = Color.Honeydew,
+                HighlightedBackColor = Color.LightBlue,
+                HighlightedForeColor = Color.FromArgb(0, 63, 0),
                 LeftBadge = UIMenuItem.BadgeStyle.Star
             };
             CpColorMenu.Main();
             checkPointMenu.BindMenuToItem(CpColorMenu.colorMenu, color);
-            checkPointMenu.AddItems(locationGroup, cpNumber, cpHeight, cpRadius, type, color, deleteCheckpoint , confirm);
+            checkPointMenu.AddItems(locationGroup, cpNumber, cpHeight, cpRadius, type, placeOnGround, color, deleteCheckpoint, confirm);
             checkPointMenu.RefreshIndex();
 
             MainMenu._menuPool.Add(checkPointMenu);

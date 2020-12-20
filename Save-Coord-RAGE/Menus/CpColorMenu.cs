@@ -14,6 +14,7 @@ namespace Save_Coord_RAGE.Menus
     {
         internal static UIMenu colorMenu;
         internal static UIMenuItem searchItem;
+        internal static List<UIMenuItem> colourUiItems = new List<UIMenuItem>();
         internal static void Main()
         {
             colorMenu = new UIMenu("Select Color", "Choose your color")
@@ -30,7 +31,28 @@ namespace Save_Coord_RAGE.Menus
             colorMenu.AddItem(searchItem = new UIMenuItem("SEARCH: "));
             CheckPointMenu.color.Items.ToList().ForEach(x =>
             {
-                colorMenu.AddItem(new UIMenuItem(x));
+                if (x.ToLower() != "custom color")
+                {
+                    var suc = Enum.TryParse(x.Replace(" ", ""), out KnownColor clr);
+                    if (!suc)
+                    {
+                        Game.DisplayNotification($"{x} is invalid KnownColor");
+                        $"{x} is invalid KnownColor".ToLog();
+                        x.Replace(" ", "").ToLog();
+                    }
+                    Color fore = Color.FromKnownColor(clr);
+                    UIMenuItem menu = new UIMenuItem(x, 
+                        $"Color {x} with RGB Value: [R: {fore.R}; G: {fore.G}; B: {fore.B}].~n~ Hue: {fore.GetHue()}, Brightness: {fore.GetBrightness()}, Saturation: {fore.GetSaturation()}")
+                    {
+                        ForeColor = Color.FromKnownColor(clr),
+                    };
+                    menu.BackColor = Color.FromArgb(105, Color.Snow);
+                    menu.HighlightedForeColor = menu.ForeColor;
+                    menu.HighlightedBackColor = Color.FromArgb(95, Color.Honeydew);
+                    GameFiber.Sleep(1);
+                    colourUiItems.Add(menu);
+                    colorMenu.AddItem(menu);
+                }                
             });
             colorMenu.RefreshIndex();
             colorMenu.OnItemSelect += MenuHandler.ItemSelectHandler;
@@ -44,10 +66,7 @@ namespace Save_Coord_RAGE.Menus
             colorMenu.RefreshIndex();
             searchItem.RightLabel = "";
             searchItem.Enabled = true;
-            CheckPointMenu.color.Items.ToList().ForEach(x =>
-            {
-                colorMenu.AddItem(new UIMenuItem(x));
-            });
+            colourUiItems.ForEach(m => colorMenu.AddItem(m));
             colorMenu.RefreshIndex();
         }
     }

@@ -125,6 +125,7 @@ namespace Save_Coord_RAGE
             int a = Convert.ToInt32(color.A);
             return NativeFunction.Natives.CREATE_CHECKPOINT<int>(47, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, r, g, b, a, 0);
         }
+        internal static string GetColorHexForHUD(this string msg, Color color) => $"<font color=\"{ColorTranslator.ToHtml(color)}\">{msg}</font>";
         internal static void DeleteCheckPoint(int checkpointHandle) => NativeFunction.Natives.DELETE_CHECKPOINT(checkpointHandle);
         internal static void DeleteCheckPoints(params int[] checkPointHandle) => checkPointHandle.ToList().ForEach(cp => DeleteCheckPoint(cp));
         internal static Random Random = new Random(MathHelper.GetRandomInteger(1000, 10000)); 

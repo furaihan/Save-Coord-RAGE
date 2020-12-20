@@ -243,6 +243,10 @@ namespace Save_Coord_RAGE
                 if (selectedItem == CpColorMenu.searchItem)
                 {
                     string query = Alat.GetKeyboardInput("Search a color", "", 30);
+                    if (string.IsNullOrWhiteSpace(query))
+                    {
+                        return;
+                    }
                     CpColorMenu.searchItem.RightLabel = query;
                     CpColorMenu.searchItem.Enabled = false;
                     var queryItems = CpColorMenu.colorMenu.MenuItems.ToList().Where(i => !i.Text.ToLower().Contains(query.ToLower()) && i != CpColorMenu.searchItem).ToList();
