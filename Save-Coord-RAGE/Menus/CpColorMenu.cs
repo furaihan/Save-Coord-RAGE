@@ -28,7 +28,15 @@ namespace Save_Coord_RAGE.Menus
             };
             colorMenu.SetBannerType(Color.MintCream);
             MainMenu._menuPool.Add(colorMenu);
-            colorMenu.AddItem(searchItem = new UIMenuItem("SEARCH: "));
+            searchItem = new UIMenuItem("Search > ")
+            {
+                DisabledForeColor = Color.Linen,
+                Description = "",
+                RightLabelStyle = new TextStyle(UIMenuItem.DefaultTextFont, Color.GhostWhite, UIMenuItem.DefaultTextScale),
+                TextStyle = TextStyle.Default.With(TextFont.ChaletComprimeCologne, Color.Cornsilk, UIMenuItem.DefaultTextScale),
+                RightBadgeInfo = new UIMenuItem.BadgeInfo("new_editor", "warningtriangle", HudColor.Red.GetColor(), sizeMultiplier: 0.95f),
+            };
+            colorMenu.AddItem(searchItem);
             CheckPointMenu.color.Items.ToList().ForEach(x =>
             {
                 if (x.ToLower() != "custom color")
@@ -41,14 +49,14 @@ namespace Save_Coord_RAGE.Menus
                         x.Replace(" ", "").ToLog();
                     }
                     Color fore = Color.FromKnownColor(clr);
-                    UIMenuItem menu = new UIMenuItem(x, 
-                        $"Color {x} with RGB Value: [R: {fore.R}; G: {fore.G}; B: {fore.B}].~n~ Hue: {fore.GetHue()}, Brightness: {fore.GetBrightness()}, Saturation: {fore.GetSaturation()}")
+                    UIMenuItem menu = new UIMenuItem(x, $"Color ~y~{x}~s~ with RGB Value: [~r~R: {fore.R}~s~; ~g~G: {fore.G}~s~; ~b~B: {fore.B}~s~].~n~" +
+                        $"Hue: {fore.GetHue():0.00}, Brightness: {fore.GetBrightness():0.00}, Saturation: {fore.GetSaturation():0.00}")
                     {
                         ForeColor = Color.FromKnownColor(clr),
                     };
                     menu.BackColor = Color.FromArgb(105, Color.Snow);
                     menu.HighlightedForeColor = menu.ForeColor;
-                    menu.HighlightedBackColor = Color.FromArgb(95, Color.Honeydew);
+                    menu.HighlightedBackColor = Color.FromArgb(95, Color.Aquamarine);
                     GameFiber.Sleep(1);
                     colourUiItems.Add(menu);
                     colorMenu.AddItem(menu);

@@ -46,11 +46,9 @@ namespace Save_Coord_RAGE.Menus
                 ForeColor = Color.WhiteSmoke
             };
             getNearestLocaionDistance = new UIMenuItem("Get Nearest Location", $"Get nearest location from {locationGroupFile.SelectedItem}");
-            UIMenuItem.BadgeInfo badgeInfo = new UIMenuItem.BadgeInfo("mpcarhud", "coil", Color.WhiteSmoke, sizeMultiplier: 0.75f);
-            placeMarker = new UIMenuItem("Place Marker / Checkpoint", $"Place or delete a marker or a checkpoint on every location in {locationGroupFile.SelectedItem} (Coming Soon)")
+            placeMarker = new UIMenuItem("Place Marker / Checkpoint", $"Place or delete a marker or a checkpoint on every location in {locationGroupFile.SelectedItem}")
             {
                 Enabled = true,
-                LeftBadgeInfo = badgeInfo
             };
             setRouteToNearest = new UIMenuItem("Enable Route on Nearest Location", "");
             deleteLocation = new UIMenuListScrollerItem<string>("Delete Location", $"delete a location from {locationGroupFile.SelectedItem}", new[] { "Nearest", "Latest"});

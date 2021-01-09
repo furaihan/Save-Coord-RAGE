@@ -112,8 +112,11 @@ namespace Save_Coord_RAGE.Menus
                 Value = 255,
                 ForeColor = Color.Snow
             };
-            color = new UIMenuListScrollerItem<string>("CheckPoint Color", "Set the color of the checkpoint that will be placed" +
-                $". Press ~y~RControlKey~s~ + ~y~NumPad9~s~ to use custom color", colors);
+            color = new UIMenuListScrollerItem<string>("CheckPoint Color", "", colors);
+            color.Description = "Set the color of the checkpoint that will be placed" +
+                        $". Press ~y~Enter~s~ to see all available color~n~" +
+                        $"Currently Selected: " + $"Color ~y~{color.SelectedItem}~s~ with RGB Value: [~r~R: {CpColor.R}~s~; ~g~G: {CpColor.G}~s~; ~b~B: {CpColor.B}~s~].~n~" +
+                        $"Hue: {CpColor.GetHue():0.00}, Brightness: {CpColor.GetBrightness():0.00}, Saturation: {CpColor.GetSaturation():0.00}";
             if (color.Items.Contains("Green")) color.SelectedItem = color.Items[color.Items.IndexOf("Green")];
             color.IndexChanged += (item, oldIOndex, newIndex) =>
             {
@@ -142,13 +145,15 @@ namespace Save_Coord_RAGE.Menus
                     if (refresh)
                     {
                         checkPointMenu.RefreshIndex();
-                        checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);
-                        color.Description = "Set the color of the checkpoint that will be placed" +
-                        $". Press ~y~RControlKey~s~ + ~y~NumPad9~s~ to use custom color";
+                        checkPointMenu.CurrentSelection = checkPointMenu.MenuItems.IndexOf(color);                        
                     }
                     if (Enum.TryParse(color.SelectedItem.Replace(" ", ""), true, out KnownColor outcolor))
                     {
                         CpColor = Color.FromKnownColor(outcolor);
+                        color.Description = "Set the color of the checkpoint that will be placed" +
+                        $". Press ~y~Enter~s~ to see all available color~n~" +
+                        $"Currently Selected: " + $"Color ~y~{color.SelectedItem}~s~ with RGB Value: [~r~R: {CpColor.R}~s~; ~g~G: {CpColor.G}~s~; ~b~B: {CpColor.B}~s~].~n~" +
+                        $"Hue: {CpColor.GetHue():0.00}, Brightness: {CpColor.GetBrightness():0.00}, Saturation: {CpColor.GetSaturation():0.00}";
                     }
                     else { Game.DisplayNotification($"~r~Color Parsing Error ==> {color.SelectedItem}"); Game.LogTrivial($"Color parsing error {color.SelectedItem}"); }
                 }
@@ -161,10 +166,9 @@ namespace Save_Coord_RAGE.Menus
 
             confirm = new UIMenuItem("Confirm", "Confirm your selection and start placing checkpoint")
             {
-                BackColor = Color.MidnightBlue,
+                BackColor = HudColor.BlueDark.GetColor(),
                 ForeColor = Color.Honeydew,
-                HighlightedBackColor = Color.LightBlue,
-                HighlightedForeColor = Color.FromArgb(0, 63, 0),
+                HighlightedBackColor = HudColor.Blue.GetColor(),
                 LeftBadge = UIMenuItem.BadgeStyle.Star
             };
             CpColorMenu.Main();
@@ -175,33 +179,8 @@ namespace Save_Coord_RAGE.Menus
             MainMenu._menuPool.Add(checkPointMenu);
             ManagerMenu.locationManager.BindMenuToItem(checkPointMenu, ManagerMenu.placeMarker);
             checkPointMenu.OnItemSelect += MenuHandler.ItemSelectHandler;
-            checkPointMenu.OnMenuOpen += CheckPointMenu_OnMenuOpen;
+            //checkPointMenu.OnMenuOpen += (s) => { if (locationGroup.Items.Contains(ManagerMenu.locationGroupFile.SelectedItem)) locationGroup.SelectedItem = ManagerMenu.locationGroupFile.SelectedItem; };
             //checkPointMenu.MenuItems.ForEach(a => a.Text.ToLog());
-        }
-
-        private static void CheckPointMenu_OnMenuOpen(UIMenu sender)
-        {
-            GameFiber.StartNew(() =>
-            {
-                while(checkPointMenu.Visible)
-                {
-                    GameFiber.Yield();
-                    if (Alat.CheckKey(System.Windows.Forms.Keys.RControlKey, System.Windows.Forms.Keys.NumPad9))
-                    {
-                        "Custom color keys press detected".ToLog();
-                        if (color.Items.Contains("Custom Color"))
-                        {
-                            if (color.SelectedItem != "Custom Color")
-                                color.SelectedItem = "Custom Color";
-                        }
-                        else
-                        {
-                            Game.LogTrivial("Custom Color doesn't exist");
-                        }
-                        GameFiber.Sleep(2500);
-                    }
-                }
-            });
         }
     }
 }
