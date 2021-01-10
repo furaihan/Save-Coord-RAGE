@@ -128,7 +128,7 @@ namespace Save_Coord_RAGE
         internal static string GetColorHexForHUD(this string msg, Color color) => $"<font color=\"{ColorTranslator.ToHtml(color)}\">{msg}</font>";
         internal static void DeleteCheckPoint(int checkpointHandle) => NativeFunction.Natives.DELETE_CHECKPOINT(checkpointHandle);
         internal static void DeleteCheckPoints(params int[] checkPointHandle) => checkPointHandle.ToList().ForEach(cp => DeleteCheckPoint(cp));
-        internal static Random Random = new Random(MathHelper.GetRandomInteger(1000, 10000)); 
+        internal static Random Random = new Random(DateTime.UtcNow.Ticks.GetHashCode()); 
         internal static T GetRandomElement<T>(this IEnumerable<T> list)
         {
             var han = list.ToList();
@@ -147,6 +147,17 @@ namespace Save_Coord_RAGE
                 newText.Append(text[i]);
             }
             return newText.ToString();
+        }
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                int k = Random.Next(n--);
+                T temp = list[n];
+                list[n] = list[k];
+                list[k] = temp;
+            }
         }
     }
 }
