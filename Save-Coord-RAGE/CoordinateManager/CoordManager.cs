@@ -261,76 +261,7 @@ namespace Save_Coord_RAGE.CoordinateManager
             });         
         }
         internal static List<int> listCP = new List<int>();
-        internal static bool checkPointActive = false;
-        internal static void CreateCheckPoint(string filename)
-        {
-            GameFiber.StartNew(delegate
-            {
-                try
-                {
-                    Game.LogTrivial("Placing marker / checkpoint started");
-                    checkPointActive = true;
-                    int checkpoint = 0;
-                    List<Vector3> locations = GetVector3FromFile(filename);
-                    locations = (from x in locations orderby x.DistanceTo(Game.LocalPlayer.Character.Position) select x).Take(50).ToList();
-                    foreach (Vector3 location in locations)
-                    {
-                        GameFiber.Yield();
-                        Game.DisplaySubtitle($"Placing marker / checkpoint on 50 nearby locations ({locations.IndexOf(location) + 1}/{locations.Count})");
-                        checkpoint = NativeFunction.Natives.CREATE_CHECKPOINT<int>(46, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, 0, 255, 0, 255, 0);
-                        NativeFunction.Natives.SET_CHECKPOINT_CYLINDER_HEIGHT(checkpoint, 35f, 35f, 2.5f);
-                        listCP.Add(checkpoint);
-                    }
-                    calculating = false;
-                    var count = 0;
-                    while (checkPointActive)
-                    {
-                        GameFiber.Yield();
-                        count++;
-                        if (count > 100000)
-                        {
-                            Game.LogTrivial("Force delete all checkpoint because too long");
-                            break;
-                        }
-                    }
-                    calculating = true;
-                    foreach (int cp in listCP)
-                    {
-                        GameFiber.Yield();
-                        Game.DisplaySubtitle($"Deleting marker / checkpoint ({listCP.IndexOf(cp) + 1}/{listCP.Count})");
-                        NativeFunction.Natives.DELETE_CHECKPOINT(cp);
-                    }
-                    calculating = false;
-                    listCP = new List<int>();
-                } catch (Exception e)
-                {
-                    if (listCP.Count > 0)
-                    {
-                        try
-                        {
-                            calculating = true;
-                            foreach (int cp in listCP)
-                            {
-                                GameFiber.Yield();
-                                Game.DisplaySubtitle($"Deleting marker / checkpoint ({listCP.IndexOf(cp) + 1}/{listCP.Count})");
-                                NativeFunction.Natives.DELETE_CHECKPOINT(cp);
-                            }
-                        }
-                        catch (Exception w)
-                        {
-                            Game.LogTrivial("Exception failed");
-                            Game.LogTrivial(w.Message);
-                            Game.LogTrivial(w.ToString());
-                        }                      
-                    }
-                    calculating = false;
-                    listCP = new List<int>();
-                    Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "An error occured while creating checkpoint");
-                    Game.LogTrivial(e.Message);
-                    Game.LogTrivial(e.ToString());
-                }
-            });            
-        }
+        internal static bool checkPointActive = false;       
         internal static void CreateCheckPoint(string filename, Color color, float radius, float height, int type, int number)
         {
             GameFiber.StartNew(delegate
@@ -391,16 +322,22 @@ namespace Save_Coord_RAGE.CoordinateManager
                         }
                         catch (Exception w)
                         {
-                            Game.LogTrivial("Exception failed");
+                            Game.LogTrivial("Failed to delete all checkpoint");
                             Game.LogTrivial(w.Message);
                             Game.LogTrivial(w.ToString());
                         }
                     }
                     calculating = false;
-                    listCP = new List<int>();
                     Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "There's an error while creating checkpoint");
                     Game.LogTrivial(e.Message);
                     Game.LogTrivial(e.ToString());
+                }
+                finally
+                {
+                    listCP = new List<int>();
+                    calculating = false;
+                    CheckPointMenu.confirm.Enabled = true;
+                    CheckPointMenu.deleteCheckpoint.Enabled = checkPointActive;
                 }
             });
         }

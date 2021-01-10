@@ -152,7 +152,7 @@ namespace Save_Coord_RAGE
                 if (selectedItem == XmlMenu.confirmExport)
                 {
                     sender.Close(false);
-                    xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", "", 32);
+                    xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", XmlMenu.locationToExport.SelectedItem + ".xml", 32);
                     if (File.Exists(@"Plugins/Save Coord/XML Export/" + xmlFileName) && !XmlMenu.allowOverwrite.Checked)
                     {
                         Game.DisplayNotification($"Export is ~r~aborted~w~, ~y~{xmlFileName}~w~ already exist");
@@ -172,7 +172,7 @@ namespace Save_Coord_RAGE
                     $"CheckPoint Amount = {CheckPointMenu.cpAmount}".ToLog();
                     $"CheckPoint Height = {CheckPointMenu.height}".ToLog();
                     $"CheckPoint Radius = {CheckPointMenu.radius}".ToLog();
-                    $"CheckPoint Type = {CheckPointMenu.pointType} -> {(int)CheckPointMenu.pointType}".ToLog();
+                    $"CheckPoint Type = {CheckPointMenu.pointType}".ToLog();
                     if (CheckPointMenu.color.SelectedItem == "Custom Color")
                     {
                         CheckPointMenu.CpColor = Color.FromArgb(CheckPointMenu.aColor.Value, CheckPointMenu.rColor.Value, CheckPointMenu.gColor.Value, CheckPointMenu.bColor.Value);

@@ -17,6 +17,7 @@ namespace Save_Coord_RAGE.XmlDivision
                 Game.LogTrivial("File name is empty or invalid, please provide a valid file name");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "File name is ~r~empty or invalid~w~, please provide a ~g~valid~w~ file name");
                 if (!filename.EndsWith(".xml")) { Game.HideHelp(); Game.DisplayHelp("Filename must have ~y~\".xml\"~w~ extension", 5000); }
+                CoordManager.calculating = false;
                 return;
             }
             if (locations.Count == 0 || heading.Count == 0) return;
@@ -24,6 +25,7 @@ namespace Save_Coord_RAGE.XmlDivision
             {
                 Game.LogTrivial($"Error while trying to export an XML file. List heading and vector3 counts are different");
                 Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Error while trying to export an XML file");
+                CoordManager.calculating = false;
                 return;
             }
             try
