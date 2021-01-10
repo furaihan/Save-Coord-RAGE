@@ -25,8 +25,8 @@ namespace Save_Coord_RAGE
         }
         internal static bool CheckKey(Keys modifierKey, Keys key)
         {
-            bool keyboarInputCheck = NativeFunction.CallByHash<int>(0x0CF2B696BBF945AE) == 0;
-            if (!keyboarInputCheck)
+            bool keyboardInputCheck = NativeFunction.Natives.x0CF2B696BBF945AE<int>() == 0;
+            if (!keyboardInputCheck)
             {
                 if (Game.IsKeyDown(key) && modifierKey == Keys.None) return true;
                 if (Game.IsKeyDownRightNow(modifierKey) && Game.IsKeyDown(key)) return true;
@@ -49,7 +49,7 @@ namespace Save_Coord_RAGE
                 string yFloat = Convert.ToString(position.Y);
                 string zFloat = Convert.ToString(position.Z);
                 string text = $"({xFloat}, {yFloat}, {zFloat})";
-                if (heading != 0) { text += $", {Convert.ToString(heading)}"; }
+                if (heading != 0) text += $", {Convert.ToString(heading)}";
                 if (!File.Exists(path))
                 {
                     var file = File.Create(path);
@@ -60,12 +60,10 @@ namespace Save_Coord_RAGE
                     tw.Close();
                 }
                 if (File.Exists(path))
-                {
                     using (var tw = new StreamWriter(path, true))
                     {
                         tw.WriteLine(text);
                     }
-                }
                 Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your coordinate has been saved ~g~successfully");
             });
         }
@@ -76,7 +74,7 @@ namespace Save_Coord_RAGE
             NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, textTitle, 0, boxText, 0, 0, 0, length);
             Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
             Game.DisplaySubtitle(textTitle, 900000);
-            while (NativeFunction.CallByHash<int>(0x0CF2B696BBF945AE) == 0)
+            while (NativeFunction.Natives.x0CF2B696BBF945AE<int>() == 0)
             {
                 GameFiber.Yield();
             }
@@ -103,21 +101,17 @@ namespace Save_Coord_RAGE
             }
             if (Directory.Exists(@"Plugins/Save Coord") && Directory.Exists(@"Plugins/Save Coord/XML Export")) Game.LogTrivial("Directory check passed");
             if (!File.Exists(@"Plugins/SaveCoordConfig.ini"))
-            {
                 Game.LogTrivial("INI configuration file not found, using default value");
-            }
             else Game.LogTrivial("INI Check Passed");
         }
         internal static string GetZoneName(this Vector3 pos)
-        {           
+        {
             string gameName = NativeFunction.Natives.GET_NAME_OF_ZONE<string>(pos.X, pos.Y, pos.Z);
             return Game.GetLocalizedString(gameName);
         }
-        internal static bool IsNumeric(this string s) => int.TryParse(s, out _);
-        internal static bool IsByteNumeric(this string s) => byte.TryParse(s, out _);
         internal static void ToLog(this string msg) => Game.LogTrivial(msg);
         internal static int CreateCheckPoint(Vector3 location) => NativeFunction.Natives.CREATE_CHECKPOINT<int>(47, location.X, location.Y, location.Z, location.X, location.Y, location.Z, 3f, 0, 255, 0, 255, 0);
-        internal static int CreateCheckPoint(Vector3 location, System.Drawing.Color color)
+        internal static int CreateCheckPoint(Vector3 location, Color color)
         {
             int r = Convert.ToInt32(color.R);
             int g = Convert.ToInt32(color.G);
@@ -128,7 +122,7 @@ namespace Save_Coord_RAGE
         internal static string GetColorHexForHUD(this string msg, Color color) => $"<font color=\"{ColorTranslator.ToHtml(color)}\">{msg}</font>";
         internal static void DeleteCheckPoint(int checkpointHandle) => NativeFunction.Natives.DELETE_CHECKPOINT(checkpointHandle);
         internal static void DeleteCheckPoints(params int[] checkPointHandle) => checkPointHandle.ToList().ForEach(cp => DeleteCheckPoint(cp));
-        internal static Random Random = new Random(DateTime.UtcNow.Ticks.GetHashCode()); 
+        internal static Random Random = new Random(DateTime.UtcNow.Ticks.GetHashCode());
         internal static T GetRandomElement<T>(this IEnumerable<T> list)
         {
             var han = list.ToList();
@@ -158,6 +152,31 @@ namespace Save_Coord_RAGE
                 list[n] = list[k];
                 list[k] = temp;
             }
+        }
+        //https://s.id/x1jup
+        public static string Replace(this string str, string oldValue, string @newValue, StringComparison comparisonType)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str.Length == 0) return str;
+            if (oldValue == null) throw new ArgumentNullException(nameof(oldValue));
+            if (oldValue.Length == 0) throw new ArgumentException("String cannot be of zero length.");
+            StringBuilder resultStringBuilder = new StringBuilder(str.Length);
+            bool isReplacementNullOrEmpty = string.IsNullOrEmpty(@newValue);
+            const int valueNotFound = -1;
+            int foundAt;
+            int startSearchFromIndex = 0;
+            while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
+            {
+                int @charsUntilReplacment = foundAt - startSearchFromIndex;
+                bool isNothingToAppend = @charsUntilReplacment == 0;
+                if (!isNothingToAppend) resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilReplacment);
+                if (!isReplacementNullOrEmpty) resultStringBuilder.Append(@newValue);
+                startSearchFromIndex = foundAt + oldValue.Length;
+                if (startSearchFromIndex == str.Length) return resultStringBuilder.ToString();
+            }
+            int @charsUntilStringEnd = str.Length - startSearchFromIndex;
+            resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilStringEnd);
+            return resultStringBuilder.ToString();
         }
     }
 }

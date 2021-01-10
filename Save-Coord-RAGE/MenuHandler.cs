@@ -4,8 +4,6 @@ using RAGENativeUI.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Save_Coord_RAGE.CoordinateManager;
 using Save_Coord_RAGE.XmlDivision;
 using Save_Coord_RAGE.Menus;
@@ -152,7 +150,7 @@ namespace Save_Coord_RAGE
                 if (selectedItem == XmlMenu.confirmExport)
                 {
                     sender.Close(false);
-                    xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", XmlMenu.locationToExport.SelectedItem + ".xml", 32);
+                    xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", XmlMenu.locationToExport.SelectedItem.Replace(".txt", ".xml", StringComparison.CurrentCultureIgnoreCase), 32);
                     if (File.Exists(@"Plugins/Save Coord/XML Export/" + xmlFileName) && !XmlMenu.allowOverwrite.Checked)
                     {
                         Game.DisplayNotification($"Export is ~r~aborted~w~, ~y~{xmlFileName}~w~ already exist");

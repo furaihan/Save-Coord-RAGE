@@ -12,12 +12,12 @@ namespace Save_Coord_RAGE
     {
         public static readonly InitializationFile ini = new InitializationFile(@"Plugins/SaveCoordConfig.ini");
 
-        public static readonly Keys menuKey = ini.ReadEnum<Keys>("Initialization", "OpenMenuKey", Keys.Q);
-        public static readonly Keys modifier = ini.ReadEnum<Keys>("Initialization", "OpenMenuModifier", Keys.LControlKey);
+        public static readonly Keys menuKey = ini.ReadEnum("Initialization", "OpenMenuKey", Keys.Q);
+        public static readonly Keys modifier = ini.ReadEnum("Initialization", "OpenMenuModifier", Keys.LControlKey);
         public static readonly bool checkVisibility = ini.ReadBoolean("Initialization", "CheckOtherPluginMenuVisibility", false);
         public static readonly bool boostPerformance = ini.ReadBoolean("Initialization", "BoostPerformance", false);
-        public static readonly Keys deleteCPKey = ini.ReadEnum<Keys>("Initialization", "DeleteCheckPointKey", Keys.Delete);
-        public static readonly Keys deleteCPModf = ini.ReadEnum<Keys>("Initialization", "DeleteCheckPointModifier", Keys.RShiftKey);
+        public static readonly Keys deleteCPKey = ini.ReadEnum("Initialization", "DeleteCheckPointKey", Keys.Delete);
+        public static readonly Keys deleteCPModf = ini.ReadEnum("Initialization", "DeleteCheckPointModifier", Keys.RShiftKey);
         public static readonly int cpTimeout = ini.ReadInt32("Initialization", "CheckPointTimeout", 10);
         internal static void IniValue()
         {
