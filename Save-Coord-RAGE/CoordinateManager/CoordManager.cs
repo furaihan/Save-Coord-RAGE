@@ -241,22 +241,23 @@ namespace Save_Coord_RAGE.CoordinateManager
                             continue;
                         }
                         output += line + Environment.NewLine;
-                    }                 
-                    TextWriter tw = new StreamWriter(path, false);
-                    tw.Write(output);
-                    tw.Close();
+                    }
+                    using (TextWriter tw = new StreamWriter(path, false))
+                        tw.Write(output);
                     Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your ~y~Nearest~s~ coordinate has been ~o~deleted~s~ ~g~successfully");
-                    Game.DisplaySubtitle("", 1);
+                    Game.DisplayNotification($"~y~X~s~: {nearest.X}~n~~y~Y~s~: {nearest.Y}~n~~y~Z~s~: {nearest.Z}~n~~y~Zone Name~s~: {Alat.GetZoneName(nearest)}");
                     Alat.DeleteCheckPoint(nCp);
-                    DelConfirm = DeleteConfirmation.Unopened;
-                    calculating = false;
                 }
                 catch (Exception e)
                 {
-                    calculating = false;
                     Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "An error occured");
                     Game.LogTrivial("Delete nearest location failed, please check your log file");
                     Game.LogTrivial(e.Message);
+                }
+                finally
+                {
+                    DelConfirm = DeleteConfirmation.Unopened;
+                    calculating = false;
                 }
             });         
         }

@@ -49,7 +49,7 @@ namespace Save_Coord_RAGE.Menus
                 HighlightedForeColor = Color.Black,
                 LeftBadge = UIMenuItem.BadgeStyle.Star
             };
-            xmlMenu.AddItems(locationToExport, allowOverwrite, confirmExport);
+            xmlMenu.AddItems(locationToExport,useStreetName, useStreetName,shuffle, allowOverwrite, confirmExport);
             ManagerMenu.locationManager.BindMenuToItem(xmlMenu, ManagerMenu.openXmlMenu);
             xmlMenu.RefreshIndex();
             xmlMenu.OnItemSelect += MenuHandler.ItemSelectHandler;

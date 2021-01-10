@@ -17,6 +17,7 @@ namespace Save_Coord_RAGE.Menus
         internal static UIMenuItem getNearestLocaionDistance;
         internal static UIMenuItem placeMarker;
         internal static UIMenuItem setRouteToNearest;
+        internal static UIMenuItem shuffle;
         internal static UIMenuListScrollerItem<string> deleteLocation;
         internal static List<string> locationGroup;
         internal static UIMenuItem deleteAllBlips;
@@ -51,6 +52,7 @@ namespace Save_Coord_RAGE.Menus
                 Enabled = true,
             };
             setRouteToNearest = new UIMenuItem("Enable Route on Nearest Location", "");
+            shuffle = new UIMenuItem("Shuffle", "Shuffle selected location file lines");
             deleteLocation = new UIMenuListScrollerItem<string>("Delete Location", $"delete a location from {locationGroupFile.SelectedItem}", new[] { "Nearest", "Latest"});
             openXmlMenu = new UIMenuItem("Export to XML", "Export your saved coordinates to an XML file")
             {
@@ -62,7 +64,7 @@ namespace Save_Coord_RAGE.Menus
             };
             XmlMenu.CreateXmlMenu();
             CheckPointMenu.CreateMenu();
-            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
+            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest,shuffle, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
             MainMenu.mainMenu.BindMenuToItem(locationManager, MainMenu.openLocationManager);
             locationManager.RefreshIndex();
             locationManager.OnItemSelect += MenuHandler.ItemSelectHandler;
