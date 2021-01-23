@@ -7,7 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using Save_Coord_RAGE.Menus;
 
 namespace Save_Coord_RAGE.CoordinateManager
@@ -197,7 +197,8 @@ namespace Save_Coord_RAGE.CoordinateManager
             {
                 try
                 {
-                    string output = string.Empty;
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    StringBuilder output = new StringBuilder();
                     Vector3 nearest = GetNearestLocation(filename);
                     if (nearest == Vector3.Zero)
                     {
@@ -221,10 +222,16 @@ namespace Save_Coord_RAGE.CoordinateManager
                         if (DelConfirm == DeleteConfirmation.Rejected) { GameFiber.Sleep(300); break; }
                         if (DelConfirm == DeleteConfirmation.Confirmed) { GameFiber.Sleep(300); break; }
                         if (!ConfirmationMenu.DeleteLocation.Visible) { DelConfirm = DeleteConfirmation.Rejected; break; }
+                        if (stopwatch.ElapsedMilliseconds > 120000)
+                        {
+                            DelConfirm = DeleteConfirmation.Rejected;
+                            GameFiber.Sleep(300);
+                            break;
+                        }
                     }
                     if (DelConfirm == DeleteConfirmation.Rejected)
                     {
-                        Game.DisplaySubtitle("~r~Okay, Cancelled", 8000);
+                        Game.DisplaySubtitle("~b~Okay, Cancelled", 8000);
                         DelConfirm = DeleteConfirmation.Unopened;
                         Alat.DeleteCheckPoint(nCp);
                         calculating = false;
@@ -240,10 +247,11 @@ namespace Save_Coord_RAGE.CoordinateManager
                             Game.LogTrivial($"Nearest location detected in line number {count}");
                             continue;
                         }
-                        output += line + Environment.NewLine;
+                        output.Append(line + Environment.NewLine);
                     }
+                    string result = output.ToString();
                     using (TextWriter tw = new StreamWriter(path, false))
-                        tw.Write(output);
+                        tw.Write(result);
                     Game.DisplayNotification("DESKTOP_PC", "FOLDER", "Save Coord", "~g~Success", "Your ~y~Nearest~s~ coordinate has been ~o~deleted~s~ ~g~successfully");
                     Game.DisplayNotification($"~y~X~s~: {nearest.X}~n~~y~Y~s~: {nearest.Y}~n~~y~Z~s~: {nearest.Z}~n~~y~Zone Name~s~: {Alat.GetZoneName(nearest)}");
                     Alat.DeleteCheckPoint(nCp);

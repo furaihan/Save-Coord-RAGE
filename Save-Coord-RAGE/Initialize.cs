@@ -15,6 +15,8 @@ namespace Save_Coord_RAGE
         public static readonly Keys menuKey = ini.ReadEnum("Initialization", "OpenMenuKey", Keys.Q);
         public static readonly Keys modifier = ini.ReadEnum("Initialization", "OpenMenuModifier", Keys.LControlKey);
         public static readonly bool checkVisibility = ini.ReadBoolean("Initialization", "CheckOtherPluginMenuVisibility", false);
+        public static readonly Keys saveKey = ini.ReadEnum<Keys>("Initialization", "SaveCoordinateKey", Keys.S);
+        public static readonly Keys saveKeyModf = ini.ReadEnum<Keys>("Initialization", "SaveCoordinateModifier", Keys.LControlKey);
         public static readonly bool boostPerformance = ini.ReadBoolean("Initialization", "BoostPerformance", false);
         public static readonly Keys deleteCPKey = ini.ReadEnum("Initialization", "DeleteCheckPointKey", Keys.Delete);
         public static readonly Keys deleteCPModf = ini.ReadEnum("Initialization", "DeleteCheckPointModifier", Keys.RShiftKey);
@@ -24,6 +26,8 @@ namespace Save_Coord_RAGE
             Game.LogTrivial($"Open Menu Key : {menuKey}");
             Game.LogTrivial($"Modifier Key : {modifier}");
             Game.LogTrivial($"Check other plugin menu visibility {checkVisibility}");
+            Game.LogTrivial($"Save Coordinate Key : {saveKey}");
+            Game.LogTrivial($"Save Coordinate Key Modifier : {saveKeyModf}");
             Game.LogTrivial($"Boost Performance : {boostPerformance}");
             $"DeleteCheckPointKey : {deleteCPKey}".ToLog();
             $"DeleteCheckPointModifier : {deleteCPModf}".ToLog();

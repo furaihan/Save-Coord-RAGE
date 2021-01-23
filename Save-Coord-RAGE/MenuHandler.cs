@@ -15,7 +15,6 @@ namespace Save_Coord_RAGE
     internal class MenuHandler
     {
         public static string filename = null;
-        public static string xmlFileName = null;
         public static bool blipExist = false;
         internal static void ItemSelectHandler(UIMenu sender, UIMenuItem selectedItem, int index)
         {
@@ -150,15 +149,26 @@ namespace Save_Coord_RAGE
                 if (selectedItem == XmlMenu.confirmExport)
                 {
                     sender.Close(false);
-                    xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", XmlMenu.locationToExport.SelectedItem.Replace(".txt", ".xml", StringComparison.CurrentCultureIgnoreCase), 32);
+                    string xmlFileName = Alat.GetKeyboardInput("File Name (must ends with .xml)", XmlMenu.locationToExport.SelectedItem.Replace(".txt", ".xml", StringComparison.CurrentCultureIgnoreCase), 32);
+                    if (string.IsNullOrWhiteSpace(xmlFileName))
+                    {
+                        Game.DisplayNotification("~r~Filename can not be empty, please try again");
+                        return;
+                    }
                     if (File.Exists(@"Plugins/Save Coord/XML Export/" + xmlFileName) && !XmlMenu.allowOverwrite.Checked)
                     {
                         Game.DisplayNotification($"Export is ~r~aborted~w~, ~y~{xmlFileName}~w~ already exist");
                         return;
                     }
+                    string rootName = Alat.GetKeyboardInput("XML Root Name", XmlMenu.locationToExport.SelectedItem.Replace(".txt", "", StringComparison.InvariantCultureIgnoreCase), 250);
+                    if (string.IsNullOrWhiteSpace(rootName))
+                    {
+                        Game.DisplayNotification("~r~XML Root cannot be empty, please try again");
+                        return;
+                    }
                     List<Vector3> vectorToExport = CoordManager.GetVector3FromFile(XmlMenu.locationToExport.SelectedItem);
                     List<float> headingToExport = CoordManager.GetHeadingFromFile(XmlMenu.locationToExport.SelectedItem);
-                    Serializer.SerializeItems(vectorToExport, headingToExport, xmlFileName);
+                    Serializer.SerializeItems(vectorToExport, headingToExport, xmlFileName, rootName);
                 }
             }
             else if (sender == CheckPointMenu.checkPointMenu)
@@ -282,9 +292,9 @@ namespace Save_Coord_RAGE
                     }
                     else if (!Initialize.checkVisibility) MainMenu.mainMenu.Visible = true;
                 }
-                if (Alat.CheckKey(System.Windows.Forms.Keys.NumPad7, System.Windows.Forms.Keys.NumPad4) && !CoordManager.CarSpawned)
+                if (Alat.CheckKey(Initialize.saveKeyModf, Initialize.saveKey))
                 {
-                    CoordManager.SpawnCarOnNearestLocation(ManagerMenu.locationGroupFile.SelectedItem);
+                    MainMenu.confirmMenu.Activate(MainMenu.mainMenu);
                 }
             }
         }

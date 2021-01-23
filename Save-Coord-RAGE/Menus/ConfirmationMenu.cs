@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rage;
-using System.Drawing;
+﻿using System.Drawing;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 
@@ -27,7 +21,10 @@ namespace Save_Coord_RAGE.Menus
             DeleteLocation.RemoveBanner();
             yesDL = new UIMenuItem("YES, ABSOLUTELY")
             {
-                BackColor = Color.FromArgb(120, Color.ForestGreen),
+                BackColor = Color.FromArgb(120, HudColor.GreenDark.GetColor()),
+                ForeColor = Color.WhiteSmoke,
+                HighlightedBackColor = Color.FromArgb(125, HudColor.GreenLight.GetColor()),
+                HighlightedForeColor = Color.Black
             };
             yesDL.Activated += (m, s) =>
             {
@@ -36,7 +33,10 @@ namespace Save_Coord_RAGE.Menus
             };
             noDL = new UIMenuItem("NO, CANCEL")
             {
-                BackColor = Color.FromArgb(120, Color.Firebrick),
+                BackColor = Color.FromArgb(120, HudColor.RedDark.GetColor()),
+                ForeColor = Color.WhiteSmoke,
+                HighlightedBackColor = Color.FromArgb(125, HudColor.RedLight.GetColor()),
+                HighlightedForeColor = Color.Black
             };
             noDL.Activated += (m, s) =>
             {

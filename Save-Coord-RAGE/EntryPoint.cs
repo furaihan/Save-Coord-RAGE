@@ -16,7 +16,6 @@ namespace Save_Coord_RAGE
         {
             GameFiber.StartNew(delegate
             {
-                AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(a => a.GetName().FullName.ToLog());
                 "Starting Save-Coord-Rage".ToLog();
                 Alat.CheckDirectory();
                 Initialize.IniValue();
@@ -25,7 +24,7 @@ namespace Save_Coord_RAGE
                 Game.DisplayNotification("CHAR_SOCIAL_CLUB", "CHAR_SOCIAL_CLUB", "Save Coord", "~g~Success", "Save Coord Plugin loaded ~g~successfully");
                 "Starting menu loop".ToLog();
                 MenuHandler.MenuLoop();
-            });
+            }, "[Save-Coord-RAGE] Main Fiber");
         }
     }
 }

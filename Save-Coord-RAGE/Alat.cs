@@ -14,15 +14,7 @@ namespace Save_Coord_RAGE
 {
     internal static class Alat
     {
-        internal static List<string> GetLocationGroups()
-        {
-            List<string> ret = new List<string>();
-            foreach (string s in Directory.GetFiles(@"Plugins/Save Coord/", "*.txt").Select(Path.GetFileName))
-            {
-                ret.Add(s);
-            }
-            return ret;
-        }
+        internal static List<string> GetLocationGroups() => Directory.GetFiles(@"Plugins/Save Coord/", "*.txt").Select(Path.GetFileName).ToList();
         internal static bool CheckKey(Keys modifierKey, Keys key)
         {
             bool keyboardInputCheck = NativeFunction.Natives.x0CF2B696BBF945AE<int>() == 0;
@@ -45,11 +37,8 @@ namespace Save_Coord_RAGE
                     return;
                 }
                 string path = @"Plugins/Save Coord/" + filename;
-                string xFloat = Convert.ToString(position.X);
-                string yFloat = Convert.ToString(position.Y);
-                string zFloat = Convert.ToString(position.Z);
-                string text = $"({xFloat}, {yFloat}, {zFloat})";
-                if (heading != 0) text += $", {Convert.ToString(heading)}";
+                string text = $"({position.X:0.00}, {position.Y:0.00}, {position.Z:0.00})";
+                if (heading != 0) text += $", {heading:0.000}";
                 if (!File.Exists(path))
                 {
                     var file = File.Create(path);
