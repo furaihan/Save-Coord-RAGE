@@ -58,9 +58,10 @@ namespace Save_Coord_RAGE
         }
         internal static string GetKeyboardInput(string textTitle, string boxText, int length)
         {
+            Localization.SetText("BAR_KEYB_TT", textTitle);
             NativeFunction.Natives.DISABLE_ALL_CONTROL_ACTIONS(2);
 
-            NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, textTitle, 0, boxText, 0, 0, 0, length);
+            NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, "BAR_KEYB_TT", 0, boxText, 0, 0, 0, length);
             Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
             Game.DisplaySubtitle(textTitle, 900000);
             while (NativeFunction.Natives.x0CF2B696BBF945AE<int>() == 0)

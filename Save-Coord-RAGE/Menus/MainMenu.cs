@@ -34,6 +34,8 @@ namespace Save_Coord_RAGE.Menus
                 TitleStyle = title
             };
             mainMenu.SetBannerType(Color.ForestGreen);
+            InstructionalButtonGroup confirmShortcut = new InstructionalButtonGroup("Confirm Shortcut", Initialize.saveKeyModf.GetInstructionalKey(), Initialize.saveKey.GetInstructionalKey());
+            mainMenu.AddInstructionalButton(confirmShortcut);
             _menuPool.Add(mainMenu);
 
             ManagerMenu.locationGroup = Alat.GetLocationGroups();

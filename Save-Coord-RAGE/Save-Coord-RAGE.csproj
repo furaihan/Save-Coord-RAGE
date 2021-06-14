@@ -31,10 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LSPD_First_Response">
-      <HintPath>..\..\Dependencies\LSPD_First_Response.dll</HintPath>
-    </Reference>
-    <Reference Include="RAGENativeUI">
+    <Reference Include="RAGENativeUI, Version=1.7.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Dependencies\RAGENativeUI.dll</HintPath>
     </Reference>
     <Reference Include="RagePluginHookSDK">
