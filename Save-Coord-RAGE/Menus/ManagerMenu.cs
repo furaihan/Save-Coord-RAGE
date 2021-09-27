@@ -17,6 +17,7 @@ namespace Save_Coord_RAGE.Menus
         internal static UIMenuItem getNearestLocaionDistance;
         internal static UIMenuItem placeMarker;
         internal static UIMenuItem setRouteToNearest;
+        internal static UIMenuItem teleportToNearest;
         internal static UIMenuItem shuffle;
         internal static UIMenuListScrollerItem<string> deleteLocation;
         internal static List<string> locationGroup;
@@ -62,9 +63,13 @@ namespace Save_Coord_RAGE.Menus
             {
                 Enabled = false,
             };
+            teleportToNearest = new UIMenuItem("Teleport To Nearest Location", "Teleports the player ped to the nearest location on the selected location group")
+            {
+                Enabled = true,
+            };
             XmlMenu.CreateXmlMenu();
             CheckPointMenu.CreateMenu();
-            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest,shuffle, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
+            locationManager.AddItems(locationGroupFile, getNearestLocaionDistance, setRouteToNearest, teleportToNearest, shuffle, placeMarker, deleteLocation, refreshIndex, deleteAllBlips ,openXmlMenu);
             MainMenu.mainMenu.BindMenuToItem(locationManager, MainMenu.openLocationManager);
             locationManager.RefreshIndex();
             locationManager.OnItemSelect += MenuHandler.ItemSelectHandler;

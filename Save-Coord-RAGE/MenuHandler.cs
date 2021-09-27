@@ -108,7 +108,28 @@ namespace Save_Coord_RAGE
                         Game.LogTrivial("Another calculating process is running");
                         Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
                     }
-                } else if (selectedItem == ManagerMenu.deleteAllBlips)
+                }
+                else if (selectedItem == ManagerMenu.teleportToNearest)
+                {
+                    if (!CoordManager.calculating)
+                    {
+                        sender.Close(false);
+                        CoordManager.calculating = true;
+                        var locations = CoordManager.GetVector3FromFile(ManagerMenu.locationGroupFile.SelectedItem);
+                        var nearest = locations.OrderBy(x => Vector3.DistanceSquared(x, Game.LocalPlayer.Character)).FirstOrDefault();
+                        var heading = CoordManager.GetHeadingFromFile(ManagerMenu.locationGroupFile.SelectedItem)[locations.IndexOf(nearest)];
+                        World.TeleportLocalPlayer(nearest, false);
+                        Game.LocalPlayer.Character.Heading = heading;
+                        CoordManager.calculating = false;
+                    }
+                    else
+                    {
+                        sender.Close(false);
+                        Game.LogTrivial("Another calculating process is running");
+                        Game.DisplayNotification("CHAR_BLOCKED", "CHAR_BLOCKED", "Save Coord", "~r~Failed", "Another calculation process is running");
+                    }
+                }
+                else if (selectedItem == ManagerMenu.deleteAllBlips)
                 {
                     blipExist = false;
                     sender.Close(false);

@@ -57,6 +57,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                         GameFiber.Yield();
                 }
                 readFileCount = 0;
+                if (!Initialize.boostPerformance) Game.DisplaySubtitle("", 2);
                 return ret;
             } catch (Exception e)
             {
