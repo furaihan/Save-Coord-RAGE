@@ -75,7 +75,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 {
                     Vector3 nearestVec = Vector3.Zero;
                     Vector3 playerPos = Game.LocalPlayer.Character.Position;
-                    nearestVec = (from x in listLocation orderby x.DistanceTo(playerPos) select x).FirstOrDefault();                 
+                    nearestVec = (from x in listLocation orderby Vector3.DistanceSquared(x, playerPos) select x).FirstOrDefault();                 
                     Game.LogTrivial("Done Calculating");
                     Game.DisplaySubtitle($"Nearest location detected in ~g~{Alat.GetZoneName(nearestVec)}~w~ near ~g~{World.GetStreetName(nearestVec)}", 8500);
                     calculating = false;
@@ -154,7 +154,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                 }
                 var playerPos = Game.LocalPlayer.Character.Position;
                 Vector3 nearestVec = Vector3.Zero;
-                nearestVec = (from x in ret orderby x.DistanceTo(playerPos) select x).FirstOrDefault();
+                nearestVec = (from x in ret orderby Vector3.DistanceSquared(x, playerPos) select x).FirstOrDefault();
                 Game.LogTrivial($"Orderby Distance {Math.Round(nearestVec.DistanceTo(playerPos))}");
                 calculating = false;
                 return nearestVec;
@@ -282,7 +282,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                     int checkpoint = 0;
                     List<Vector3> locations = GetVector3FromFile(filename);
                     int actualNumber = locations.Count > number ? number : locations.Count;
-                    locations = (from x in locations orderby x.DistanceTo(Game.LocalPlayer.Character.Position) select x).Take(actualNumber).ToList();
+                    locations = (from x in locations orderby Vector3.DistanceSquared(x, Game.LocalPlayer.Character.Position) select x).Take(actualNumber).ToList();
                     foreach (Vector3 locationo in locations)
                     {
                         GameFiber.Yield();
@@ -363,7 +363,7 @@ namespace Save_Coord_RAGE.CoordinateManager
                     Game.DisplayNotification("Count is not same");
                     return;
                 }
-                Vector3 loc = (from x in locs orderby x.DistanceTo(Game.LocalPlayer.Character) select x).FirstOrDefault();
+                Vector3 loc = (from x in locs orderby Vector3.DistanceSquared(x, Game.LocalPlayer.Character.Position) select x).FirstOrDefault();
                 float heading = headings[locs.IndexOf(loc)];
                 var veh = new Vehicle(m => m.IsCar, loc, heading);
                 var cp = Alat.CreateCheckPoint(veh.Position, Color.DarkMagenta);

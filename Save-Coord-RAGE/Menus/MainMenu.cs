@@ -52,7 +52,7 @@ namespace Save_Coord_RAGE.Menus
             {
                 Enabled = false
             };
-            entityCoordinate = new UIMenuListScrollerItem<string>("Coordinates", "Choose beetwen your coordinates or your vehicle coordinates",
+            entityCoordinate = new UIMenuListScrollerItem<string>("Coordinate", "Choose beetwen your coordinates or your vehicle coordinates",
                 new[] { "Player", "Player Vehicle" });
             confirmMenu = new UIMenuItem("Confirm", "Confirm your choice")
             {

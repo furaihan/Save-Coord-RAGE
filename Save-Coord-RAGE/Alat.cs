@@ -63,13 +63,13 @@ namespace Save_Coord_RAGE
 
             NativeFunction.Natives.DISPLAY_ONSCREEN_KEYBOARD(true, "BAR_KEYB_TT", 0, boxText, 0, 0, 0, length);
             Game.DisplayHelp($"Press {FormatKeyBinding(Keys.None, Keys.Enter)} to commit changes\nPress {FormatKeyBinding(Keys.None, Keys.Escape)} to back", true);
-            Game.DisplaySubtitle(textTitle, 900000);
+            Game.DisplaySubtitle(textTitle, 999999);
             while (NativeFunction.Natives.x0CF2B696BBF945AE<int>() == 0)
             {
                 GameFiber.Yield();
             }
             NativeFunction.Natives.ENABLE_ALL_CONTROL_ACTIONS(2);
-            Game.DisplaySubtitle("");
+            Game.DisplaySubtitle("", 50);
             Game.HideHelp();
 
             return NativeFunction.Natives.GET_ONSCREEN_KEYBOARD_RESULT<string>();
